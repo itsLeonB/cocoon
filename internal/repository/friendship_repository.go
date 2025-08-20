@@ -54,7 +54,7 @@ func (fr *friendshipRepositoryGorm) FindFirstBySpec(ctx context.Context, spec en
 
 	if spec.Name != "" {
 		query = query.Where(
-			fr.db.Where("up1.name = ? AND friendships.profile_id1 <> ?", spec.Name, spec.Model.ProfileID1).
+			db.Where("up1.name = ? AND friendships.profile_id1 <> ?", spec.Name, spec.Model.ProfileID1).
 				Or("up2.name = ? AND friendships.profile_id2 <> ?", spec.Name, spec.Model.ProfileID1),
 		)
 	}

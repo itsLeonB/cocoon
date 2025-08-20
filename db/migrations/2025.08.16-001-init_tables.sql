@@ -14,10 +14,10 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS user_profiles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
     name TEXT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMPTZ
 );
 COMMENT ON COLUMN user_profiles.user_id IS 'Nullable. Can be NULL for peers who do not have an account in the app';
@@ -27,8 +27,8 @@ CREATE TABLE IF NOT EXISTS friendships (
     profile_id1 UUID NOT NULL REFERENCES user_profiles(id),
     profile_id2 UUID NOT NULL REFERENCES user_profiles(id),
     type friendship_type NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMPTZ,
     CONSTRAINT unique_friendship UNIQUE (profile_id1, profile_id2),
     CONSTRAINT profile_order CHECK (profile_id1 < profile_id2)

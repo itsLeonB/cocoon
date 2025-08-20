@@ -4,5 +4,5 @@ type FriendshipType string
 
 const (
 	Real      FriendshipType = "REAL"
-	Anonymous FriendshipType = "ANONONYMOUS"
+	Anonymous FriendshipType = "ANON"
 )

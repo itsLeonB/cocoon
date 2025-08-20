@@ -1,13 +1,15 @@
 package mapper
 
 import (
+	"strings"
+
 	"github.com/itsLeonB/cocoon/gen/go/auth"
 	"github.com/itsLeonB/cocoon/internal/dto"
 )
 
 func FromRegisterRequestProto(req *auth.RegisterRequest) dto.RegisterRequest {
 	return dto.RegisterRequest{
-		Email:                req.GetEmail(),
+		Email:                strings.ToLower(req.GetEmail()),
 		Password:             req.GetPassword(),
 		PasswordConfirmation: req.GetPasswordConfirmation(),
 	}
@@ -15,7 +17,7 @@ func FromRegisterRequestProto(req *auth.RegisterRequest) dto.RegisterRequest {
 
 func FromLoginRequestProto(req *auth.LoginRequest) dto.LoginRequest {
 	return dto.LoginRequest{
-		Email:    req.GetEmail(),
+		Email:    strings.ToLower(req.GetEmail()),
 		Password: req.GetPassword(),
 	}
 }
