@@ -3,7 +3,7 @@ package mapper
 import (
 	"strings"
 
-	"github.com/itsLeonB/cocoon/gen/go/auth"
+	"github.com/itsLeonB/cocoon-protos/gen/go/auth"
 	"github.com/itsLeonB/cocoon/internal/dto"
 )
 

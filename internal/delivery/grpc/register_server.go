@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	"github.com/itsLeonB/cocoon/gen/go/auth"
+	"github.com/itsLeonB/cocoon-protos/gen/go/auth"
 	"google.golang.org/grpc"
 )
 

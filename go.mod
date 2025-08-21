@@ -2,12 +2,10 @@ module github.com/itsLeonB/cocoon
 
 go 1.24.4
 
-replace github.com/itsLeonB/cocoon/gen/go => ./gen/go
-
 require (
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/google/uuid v1.6.0
-	github.com/itsLeonB/cocoon/gen/go v0.0.0-00010101000000-000000000000
+	github.com/itsLeonB/cocoon-protos v0.1.0-beta
 	github.com/itsLeonB/ezutil v1.2.0
 	github.com/joho/godotenv v1.5.1
 	github.com/rotisserie/eris v0.5.4

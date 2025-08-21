@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/itsLeonB/cocoon/gen/go/auth"
+	"github.com/itsLeonB/cocoon-protos/gen/go/auth"
 	"github.com/itsLeonB/cocoon/internal/delivery/grpc/mapper"
 	"github.com/itsLeonB/cocoon/internal/service"
 )
