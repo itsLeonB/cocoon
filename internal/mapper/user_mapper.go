@@ -25,7 +25,7 @@ func UserToResponse(user entity.User) dto.UserResponse {
 func UserToProfileResponse(user entity.User) dto.ProfileResponse {
 	return dto.ProfileResponse{
 		UserID:    user.ID,
-		ProfileID: user.Profile.ID,
+		ID:        user.Profile.ID,
 		Name:      user.Profile.Name,
 		CreatedAt: user.Profile.CreatedAt,
 		UpdatedAt: user.Profile.UpdatedAt,
@@ -36,7 +36,7 @@ func UserToProfileResponse(user entity.User) dto.ProfileResponse {
 func ProfileToResponse(profile entity.UserProfile) dto.ProfileResponse {
 	return dto.ProfileResponse{
 		UserID:    profile.UserID,
-		ProfileID: profile.ID,
+		ID:        profile.ID,
 		Name:      profile.Name,
 		CreatedAt: profile.CreatedAt,
 		UpdatedAt: profile.UpdatedAt,

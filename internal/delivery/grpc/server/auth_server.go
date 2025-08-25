@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/itsLeonB/cocoon-protos/gen/go/auth"
-	"github.com/itsLeonB/cocoon/internal/delivery/grpc/mapper"
+	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/service"
 )
 
@@ -18,7 +18,7 @@ type AuthServer struct {
 func NewAuthServer(
 	validate *validator.Validate,
 	authService service.AuthService,
-) *AuthServer {
+) auth.AuthServiceServer {
 	return &AuthServer{
 		validate:    validate,
 		authService: authService,
@@ -26,7 +26,11 @@ func NewAuthServer(
 }
 
 func (as *AuthServer) Register(ctx context.Context, req *auth.RegisterRequest) (*auth.RegisterResponse, error) {
-	request := mapper.FromRegisterRequestProto(req)
+	request := dto.RegisterRequest{
+		Email:                req.GetEmail(),
+		Password:             req.GetPassword(),
+		PasswordConfirmation: req.GetPasswordConfirmation(),
+	}
 
 	if err := as.validate.Struct(request); err != nil {
 		return nil, err
@@ -42,7 +46,10 @@ func (as *AuthServer) Register(ctx context.Context, req *auth.RegisterRequest) (
 }
 
 func (as *AuthServer) Login(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error) {
-	request := mapper.FromLoginRequestProto(req)
+	request := dto.LoginRequest{
+		Email:    req.GetEmail(),
+		Password: req.GetPassword(),
+	}
 
 	if err := as.validate.Struct(request); err != nil {
 		return nil, err
@@ -53,5 +60,19 @@ func (as *AuthServer) Login(ctx context.Context, req *auth.LoginRequest) (*auth.
 		return nil, err
 	}
 
-	return mapper.ToLoginResponseProto(response), nil
+	return &auth.LoginResponse{
+		Type:  response.Type,
+		Token: response.Token,
+	}, nil
+}
+
+func (as *AuthServer) VerifyToken(ctx context.Context, req *auth.VerifyTokenRequest) (*auth.AuthData, error) {
+	authData, err := as.authService.VerifyToken(ctx, req.GetToken())
+	if err != nil {
+		return nil, err
+	}
+
+	return &auth.AuthData{
+		ProfileId: authData.ProfileID.String(),
+	}, nil
 }

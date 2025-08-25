@@ -1,0 +1,70 @@
+package server
+
+import (
+	"context"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
+	"github.com/itsLeonB/cocoon-protos/gen/go/profile"
+	"github.com/itsLeonB/cocoon/internal/delivery/grpc/mapper"
+	"github.com/itsLeonB/cocoon/internal/dto"
+	"github.com/itsLeonB/cocoon/internal/service"
+	"github.com/itsLeonB/ezutil"
+)
+
+type ProfileServer struct {
+	profile.UnimplementedProfileServiceServer
+	validate       *validator.Validate
+	profileService service.ProfileService
+}
+
+func NewProfileServer(
+	validate *validator.Validate,
+	profileService service.ProfileService,
+) profile.ProfileServiceServer {
+	return &ProfileServer{
+		validate:       validate,
+		profileService: profileService,
+	}
+}
+
+func (ps *ProfileServer) Get(ctx context.Context, req *profile.ProfileRequest) (*profile.ProfileResponse, error) {
+	id, err := uuid.Parse(req.GetProfileId())
+	if err != nil {
+		return nil, ezutil.ValidationError("profile_id is not a valid uuid")
+	}
+
+	prof, err := ps.profileService.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.ToProfileProto(prof), nil
+}
+
+func (ps *ProfileServer) Create(ctx context.Context, req *profile.NewProfileRequest) (*profile.ProfileResponse, error) {
+	var userID uuid.UUID
+	if req.GetUserId() != "" {
+		parsedID, err := ezutil.Parse[uuid.UUID](req.GetUserId())
+		if err != nil {
+			return nil, err
+		}
+		userID = parsedID
+	}
+
+	request := dto.NewProfileRequest{
+		UserID: userID,
+		Name:   req.GetName(),
+	}
+
+	if err := ps.validate.Struct(request); err != nil {
+		return nil, err
+	}
+
+	createdProfile, err := ps.profileService.Create(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapper.ToProfileProto(createdProfile), nil
+}

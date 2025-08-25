@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/entity"
@@ -11,14 +12,15 @@ import (
 	"github.com/itsLeonB/cocoon/internal/repository"
 	"github.com/itsLeonB/cocoon/internal/util"
 	"github.com/itsLeonB/ezutil"
+	"github.com/rotisserie/eris"
 )
 
 type authServiceImpl struct {
-	hashService           ezutil.HashService
-	jwtService            ezutil.JWTService
-	userRepository        repository.UserRepository
-	transactor            ezutil.Transactor
-	userProfileRepository repository.UserProfileRepository
+	hashService    ezutil.HashService
+	jwtService     ezutil.JWTService
+	userRepository repository.UserRepository
+	transactor     ezutil.Transactor
+	profileService ProfileService
 }
 
 func NewAuthService(
@@ -26,14 +28,14 @@ func NewAuthService(
 	jwtService ezutil.JWTService,
 	userRepository repository.UserRepository,
 	transactor ezutil.Transactor,
-	userProfileRepository repository.UserProfileRepository,
+	profileService ProfileService,
 ) AuthService {
 	return &authServiceImpl{
 		hashService,
 		jwtService,
 		userRepository,
 		transactor,
-		userProfileRepository,
+		profileService,
 	}
 }
 
@@ -62,12 +64,12 @@ func (as *authServiceImpl) Register(ctx context.Context, request dto.RegisterReq
 			return err
 		}
 
-		profile := entity.UserProfile{
+		profile := dto.NewProfileRequest{
 			UserID: user.ID,
 			Name:   util.GetNameFromEmail(request.Email),
 		}
 
-		if _, err = as.userProfileRepository.Insert(ctx, profile); err != nil {
+		if _, err = as.profileService.Create(ctx, profile); err != nil {
 			return err
 		}
 
@@ -103,5 +105,42 @@ func (as *authServiceImpl) Login(ctx context.Context, request dto.LoginRequest) 
 	return dto.LoginResponse{
 		Type:  "Bearer",
 		Token: token,
+	}, nil
+}
+
+func (as *authServiceImpl) VerifyToken(ctx context.Context, token string) (dto.AuthData, error) {
+	claims, err := as.jwtService.VerifyToken(token)
+	if err != nil {
+		return dto.AuthData{}, err
+	}
+
+	tokenUserId, exists := claims.Data[appconstant.ContextUserID]
+	if !exists {
+		return dto.AuthData{}, eris.New("missing user ID from token")
+	}
+	stringUserID, ok := tokenUserId.(string)
+	if !ok {
+		return dto.AuthData{}, eris.New("error asserting userID, is not a string")
+	}
+	userID, err := ezutil.Parse[uuid.UUID](stringUserID)
+	if err != nil {
+		return dto.AuthData{}, err
+	}
+
+	spec := ezutil.Specification[entity.User]{}
+	spec.Model.ID = userID
+	user, err := as.userRepository.FindFirst(ctx, spec)
+	if err != nil {
+		return dto.AuthData{}, err
+	}
+	if user.IsZero() {
+		return dto.AuthData{}, eris.New("user ID is not found")
+	}
+	if user.IsDeleted() {
+		return dto.AuthData{}, eris.New("user is deleted")
+	}
+
+	return dto.AuthData{
+		ProfileID: user.Profile.ID,
 	}, nil
 }

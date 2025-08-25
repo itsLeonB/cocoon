@@ -7,7 +7,7 @@ import (
 
 type Services struct {
 	Auth       service.AuthService
-	User       service.UserService
+	Profile    service.ProfileService
 	Friendship service.FriendshipService
 }
 
@@ -16,30 +16,28 @@ func ProvideServices(configs *ezutil.Config, repos *Repositories) *Services {
 
 	jwtService := ezutil.NewJwtService(configs.Auth)
 
+	profileService := service.NewProfileService(
+		repos.Transactor,
+		repos.UserProfile,
+	)
+
 	authService := service.NewAuthService(
 		hashService,
 		jwtService,
 		repos.User,
 		repos.Transactor,
-		repos.UserProfile,
-	)
-
-	userService := service.NewUserService(
-		repos.Transactor,
-		repos.User,
-		repos.UserProfile,
+		profileService,
 	)
 
 	friendshipService := service.NewFriendshipService(
 		repos.Transactor,
-		repos.UserProfile,
 		repos.Friendship,
-		userService,
+		profileService,
 	)
 
 	return &Services{
 		Auth:       authService,
-		User:       userService,
+		Profile:    profileService,
 		Friendship: friendshipService,
 	}
 }

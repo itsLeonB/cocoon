@@ -1,5 +1,7 @@
 package dto
 
+import "github.com/google/uuid"
+
 type RegisterRequest struct {
 	Email                string `validate:"required,email,min=3"`
 	Password             string `validate:"required,eqfield=PasswordConfirmation"`
@@ -14,4 +16,8 @@ type LoginRequest struct {
 type LoginResponse struct {
 	Type  string
 	Token string
+}
+
+type AuthData struct {
+	ProfileID uuid.UUID
 }

@@ -26,21 +26,17 @@ func FriendshipToResponse(userProfileID uuid.UUID, friendship entity.Friendship)
 	}, nil
 }
 
-func OrderProfilesToFriendship(userProfile, friendProfile entity.UserProfile) (entity.Friendship, error) {
+func OrderProfilesToFriendship(userProfile, friendProfile dto.ProfileResponse) (entity.Friendship, error) {
 	switch ezutil.CompareUUID(userProfile.ID, friendProfile.ID) {
 	case 1:
 		return entity.Friendship{
 			ProfileID1: friendProfile.ID,
 			ProfileID2: userProfile.ID,
-			Profile1:   friendProfile,
-			Profile2:   userProfile,
 		}, nil
 	case -1:
 		return entity.Friendship{
 			ProfileID1: userProfile.ID,
 			ProfileID2: friendProfile.ID,
-			Profile1:   userProfile,
-			Profile2:   friendProfile,
 		}, nil
 	default:
 		return entity.Friendship{}, eris.New("both IDs are equal, cannot create friendship")
@@ -75,7 +71,7 @@ func MapToFriendDetails(userProfileID uuid.UUID, friendship entity.Friendship) (
 
 	return dto.FriendDetails{
 		ID:        friendship.ID,
-		ProfileID: friendProfile.ProfileID,
+		ProfileID: friendProfile.ID,
 		Name:      friendProfile.Name,
 		Type:      friendship.Type,
 		CreatedAt: friendship.CreatedAt,

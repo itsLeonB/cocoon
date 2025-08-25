@@ -14,23 +14,20 @@ import (
 )
 
 type friendshipServiceImpl struct {
-	transactor            ezutil.Transactor
-	userProfileRepository repository.UserProfileRepository
-	friendshipRepository  repository.FriendshipRepository
-	userService           UserService
+	transactor           ezutil.Transactor
+	friendshipRepository repository.FriendshipRepository
+	profileService       ProfileService
 }
 
 func NewFriendshipService(
 	transactor ezutil.Transactor,
-	userProfileRepository repository.UserProfileRepository,
 	friendshipRepository repository.FriendshipRepository,
-	userService UserService,
+	profileService ProfileService,
 ) FriendshipService {
 	return &friendshipServiceImpl{
 		transactor,
-		userProfileRepository,
 		friendshipRepository,
-		userService,
+		profileService,
 	}
 }
 
@@ -41,16 +38,16 @@ func (fs *friendshipServiceImpl) CreateAnonymous(
 	var response dto.FriendshipResponse
 
 	err := fs.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
-		user, err := fs.userService.GetEntityByID(ctx, request.UserID)
+		profile, err := fs.profileService.GetByID(ctx, request.ProfileID)
 		if err != nil {
 			return err
 		}
 
-		if err = fs.validateExistingAnonymousFriendship(ctx, user.Profile.ID, request.Name); err != nil {
+		if err = fs.validateExistingAnonymousFriendship(ctx, profile.ID, request.Name); err != nil {
 			return err
 		}
 
-		response, err = fs.insertAnonymousFriendship(ctx, user.Profile, request.Name)
+		response, err = fs.insertAnonymousFriendship(ctx, profile, request.Name)
 		if err != nil {
 			return err
 		}
@@ -65,13 +62,14 @@ func (fs *friendshipServiceImpl) CreateAnonymous(
 	return response, nil
 }
 
-func (fs *friendshipServiceImpl) GetAll(ctx context.Context, userID uuid.UUID) ([]dto.FriendshipResponse, error) {
-	user, err := fs.userService.GetEntityByID(ctx, userID)
+func (fs *friendshipServiceImpl) GetAll(ctx context.Context, profileID uuid.UUID) ([]dto.FriendshipResponse, error) {
+	profile, err := fs.profileService.GetByID(ctx, profileID)
 	if err != nil {
 		return nil, err
 	}
+
 	spec := entity.FriendshipSpecification{}
-	spec.Model.ProfileID1 = user.Profile.ID
+	spec.Model.ProfileID1 = profile.ID
 	spec.PreloadRelations = []string{"Profile1", "Profile2"}
 
 	friendships, err := fs.friendshipRepository.FindAllBySpec(ctx, spec)
@@ -80,14 +78,14 @@ func (fs *friendshipServiceImpl) GetAll(ctx context.Context, userID uuid.UUID) (
 	}
 
 	mapperFunc := func(friendship entity.Friendship) (dto.FriendshipResponse, error) {
-		return mapper.FriendshipToResponse(user.Profile.ID, friendship)
+		return mapper.FriendshipToResponse(profile.ID, friendship)
 	}
 
 	return ezutil.MapSliceWithError(friendships, mapperFunc)
 }
 
-func (fs *friendshipServiceImpl) GetDetails(ctx context.Context, userID, friendshipID uuid.UUID) (dto.FriendDetails, error) {
-	user, err := fs.userService.GetEntityByID(ctx, userID)
+func (fs *friendshipServiceImpl) GetDetails(ctx context.Context, profileID, friendshipID uuid.UUID) (dto.FriendDetails, error) {
+	profile, err := fs.profileService.GetByID(ctx, profileID)
 	if err != nil {
 		return dto.FriendDetails{}, err
 	}
@@ -103,7 +101,7 @@ func (fs *friendshipServiceImpl) GetDetails(ctx context.Context, userID, friends
 		return dto.FriendDetails{}, ezutil.NotFoundError(appconstant.ErrFriendshipNotFound)
 	}
 
-	return mapper.MapToFriendDetails(user.Profile.ID, friendship)
+	return mapper.MapToFriendDetails(profile.ID, friendship)
 }
 
 func (fs *friendshipServiceImpl) IsFriends(ctx context.Context, profileID1, profileID2 uuid.UUID) (bool, error) {
@@ -142,12 +140,12 @@ func (fs *friendshipServiceImpl) validateExistingAnonymousFriendship(
 
 func (fs *friendshipServiceImpl) insertAnonymousFriendship(
 	ctx context.Context,
-	userProfile entity.UserProfile,
+	userProfile dto.ProfileResponse,
 	friendName string,
 ) (dto.FriendshipResponse, error) {
-	newProfile := entity.UserProfile{Name: friendName}
+	newProfile := dto.NewProfileRequest{Name: friendName}
 
-	insertedProfile, err := fs.userProfileRepository.Insert(ctx, newProfile)
+	insertedProfile, err := fs.profileService.Create(ctx, newProfile)
 	if err != nil {
 		return dto.FriendshipResponse{}, err
 	}

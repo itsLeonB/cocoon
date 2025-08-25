@@ -8,8 +8,8 @@ import (
 )
 
 type NewAnonymousFriendshipRequest struct {
-	UserID uuid.UUID
-	Name   string `json:"name" binding:"required,min=3"`
+	ProfileID uuid.UUID
+	Name      string `json:"name" validate:"required,min=3"`
 }
 
 type FriendshipResponse struct {
