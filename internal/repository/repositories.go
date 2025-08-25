@@ -14,6 +14,7 @@ type UserRepository interface {
 
 type UserProfileRepository interface {
 	ezutil.CRUDRepository[entity.UserProfile]
+	FindByIDs(ctx context.Context, ids []uuid.UUID) ([]entity.UserProfile, error)
 }
 
 type FriendshipRepository interface {

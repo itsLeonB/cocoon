@@ -16,6 +16,7 @@ type AuthService interface {
 type ProfileService interface {
 	Create(ctx context.Context, request dto.NewProfileRequest) (dto.ProfileResponse, error)
 	GetByID(ctx context.Context, id uuid.UUID) (dto.ProfileResponse, error)
+	GetNames(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]string, error)
 }
 
 type FriendshipService interface {

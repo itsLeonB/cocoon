@@ -68,3 +68,24 @@ func (ps *ProfileServer) Create(ctx context.Context, req *profile.NewProfileRequ
 
 	return mapper.ToProfileProto(createdProfile), nil
 }
+
+func (ps *ProfileServer) GetNames(ctx context.Context, req *profile.GetNamesRequest) (*profile.GetNamesResponse, error) {
+	profileIDs, err := ezutil.MapSliceWithError(req.GetProfileIds(), ezutil.Parse[uuid.UUID])
+	if err != nil {
+		return nil, err
+	}
+
+	namesMap, err := ps.profileService.GetNames(ctx, profileIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	namesByProfileID := make(map[string]string, len(namesMap))
+	for id, name := range namesMap {
+		namesByProfileID[id.String()] = name
+	}
+
+	return &profile.GetNamesResponse{
+		NamesByProfileId: namesByProfileID,
+	}, nil
+}

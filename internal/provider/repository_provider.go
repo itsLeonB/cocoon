@@ -18,7 +18,7 @@ func ProvideRepositories(db *gorm.DB) *Repositories {
 	return &Repositories{
 		Transactor:  ezutil.NewTransactor(db),
 		User:        ezutil.NewCRUDRepository[entity.User](db),
-		UserProfile: ezutil.NewCRUDRepository[entity.UserProfile](db),
+		UserProfile: repository.NewProfileRepository(db),
 		Friendship:  repository.NewFriendshipRepository(db),
 	}
 }
