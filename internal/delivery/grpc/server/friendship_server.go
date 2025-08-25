@@ -83,16 +83,18 @@ func (fs *FriendshipServer) GetDetails(ctx context.Context, req *friendship.GetD
 	}
 
 	return &friendship.FriendDetails{
-		Id:        response.ID.String(),
-		ProfileId: response.ProfileID.String(),
-		Name:      response.Name,
-		Type:      mapper.ToFriendshipTypeEnum(response.Type),
-		Email:     response.Email,
-		Phone:     response.Phone,
-		Avatar:    response.Avatar,
-		CreatedAt: timestamppb.New(response.CreatedAt),
-		UpdatedAt: timestamppb.New(response.UpdatedAt),
-		DeletedAt: timestamppb.New(response.DeletedAt),
+		Id:         response.ID.String(),
+		ProfileId:  response.ProfileID.String(),
+		Name:       response.Name,
+		Type:       mapper.ToFriendshipTypeEnum(response.Type),
+		Email:      response.Email,
+		Phone:      response.Phone,
+		Avatar:     response.Avatar,
+		CreatedAt:  timestamppb.New(response.CreatedAt),
+		UpdatedAt:  timestamppb.New(response.UpdatedAt),
+		DeletedAt:  timestamppb.New(response.DeletedAt),
+		ProfileId1: response.ProfileID1.String(),
+		ProfileId2: response.ProfileID2.String(),
 	}, nil
 }
 

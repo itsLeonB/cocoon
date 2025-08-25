@@ -70,12 +70,14 @@ func MapToFriendDetails(userProfileID uuid.UUID, friendship entity.Friendship) (
 	friendProfile := friendshipWithProfile.FriendProfile
 
 	return dto.FriendDetails{
-		ID:        friendship.ID,
-		ProfileID: friendProfile.ID,
-		Name:      friendProfile.Name,
-		Type:      friendship.Type,
-		CreatedAt: friendship.CreatedAt,
-		UpdatedAt: friendship.UpdatedAt,
-		DeletedAt: friendship.DeletedAt.Time,
+		ID:         friendship.ID,
+		ProfileID:  friendProfile.ID,
+		Name:       friendProfile.Name,
+		Type:       friendship.Type,
+		CreatedAt:  friendship.CreatedAt,
+		UpdatedAt:  friendship.UpdatedAt,
+		DeletedAt:  friendship.DeletedAt.Time,
+		ProfileID1: friendship.ProfileID1,
+		ProfileID2: friendship.ProfileID2,
 	}, nil
 }

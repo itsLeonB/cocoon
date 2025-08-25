@@ -29,14 +29,16 @@ type FriendshipWithProfile struct {
 }
 
 type FriendDetails struct {
-	ID        uuid.UUID                  `json:"id"`
-	ProfileID uuid.UUID                  `json:"profileId"`
-	Name      string                     `json:"name"`
-	Type      appconstant.FriendshipType `json:"type"`
-	Email     string                     `json:"email,omitempty"`
-	Phone     string                     `json:"phone,omitempty"`
-	Avatar    string                     `json:"avatar,omitempty"`
-	CreatedAt time.Time                  `json:"createdAt"`
-	UpdatedAt time.Time                  `json:"updatedAt"`
-	DeletedAt time.Time                  `json:"deletedAt,omitzero"`
+	ID         uuid.UUID                  `json:"id"`
+	ProfileID  uuid.UUID                  `json:"profileId"`
+	Name       string                     `json:"name"`
+	Type       appconstant.FriendshipType `json:"type"`
+	Email      string                     `json:"email,omitempty"`
+	Phone      string                     `json:"phone,omitempty"`
+	Avatar     string                     `json:"avatar,omitempty"`
+	CreatedAt  time.Time                  `json:"createdAt"`
+	UpdatedAt  time.Time                  `json:"updatedAt"`
+	DeletedAt  time.Time                  `json:"deletedAt,omitzero"`
+	ProfileID1 uuid.UUID
+	ProfileID2 uuid.UUID
 }
