@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
-	"github.com/itsLeonB/cocoon-protos/gen/go/friendship"
+	"github.com/itsLeonB/cocoon-protos/gen/go/friendship/v1"
 	"github.com/itsLeonB/cocoon/internal/delivery/grpc/mapper"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/service"
@@ -29,7 +29,7 @@ func NewFriendshipServer(
 	}
 }
 
-func (fs *FriendshipServer) CreateAnonymous(ctx context.Context, req *friendship.NewAnonymousFriendshipRequest) (*friendship.FriendshipResponse, error) {
+func (fs *FriendshipServer) CreateAnonymous(ctx context.Context, req *friendship.CreateAnonymousRequest) (*friendship.CreateAnonymousResponse, error) {
 	profileID, err := ezutil.Parse[uuid.UUID](req.GetProfileId())
 	if err != nil {
 		return nil, err
@@ -49,7 +49,9 @@ func (fs *FriendshipServer) CreateAnonymous(ctx context.Context, req *friendship
 		return nil, err
 	}
 
-	return mapper.ToFriendshipProto(response), nil
+	return &friendship.CreateAnonymousResponse{
+		Friendship: mapper.ToFriendshipProto(response),
+	}, nil
 }
 
 func (fs *FriendshipServer) GetAll(ctx context.Context, req *friendship.GetAllRequest) (*friendship.GetAllResponse, error) {
@@ -66,7 +68,7 @@ func (fs *FriendshipServer) GetAll(ctx context.Context, req *friendship.GetAllRe
 	return &friendship.GetAllResponse{Friendships: ezutil.MapSlice(response, mapper.ToFriendshipProto)}, nil
 }
 
-func (fs *FriendshipServer) GetDetails(ctx context.Context, req *friendship.GetDetailsRequest) (*friendship.FriendDetails, error) {
+func (fs *FriendshipServer) GetDetails(ctx context.Context, req *friendship.GetDetailsRequest) (*friendship.GetDetailsResponse, error) {
 	profileID, err := ezutil.Parse[uuid.UUID](req.GetProfileId())
 	if err != nil {
 		return nil, err
@@ -82,7 +84,7 @@ func (fs *FriendshipServer) GetDetails(ctx context.Context, req *friendship.GetD
 		return nil, err
 	}
 
-	return &friendship.FriendDetails{
+	return &friendship.GetDetailsResponse{
 		Id:         response.ID.String(),
 		ProfileId:  response.ProfileID.String(),
 		Name:       response.Name,

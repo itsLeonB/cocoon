@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/itsLeonB/cocoon-protos/gen/go/auth"
+	"github.com/itsLeonB/cocoon-protos/gen/go/auth/v1"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/service"
 )
@@ -66,13 +66,13 @@ func (as *AuthServer) Login(ctx context.Context, req *auth.LoginRequest) (*auth.
 	}, nil
 }
 
-func (as *AuthServer) VerifyToken(ctx context.Context, req *auth.VerifyTokenRequest) (*auth.AuthData, error) {
+func (as *AuthServer) VerifyToken(ctx context.Context, req *auth.VerifyTokenRequest) (*auth.VerifyTokenResponse, error) {
 	authData, err := as.authService.VerifyToken(ctx, req.GetToken())
 	if err != nil {
 		return nil, err
 	}
 
-	return &auth.AuthData{
+	return &auth.VerifyTokenResponse{
 		ProfileId: authData.ProfileID.String(),
 	}, nil
 }

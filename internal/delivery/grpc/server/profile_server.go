@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
-	"github.com/itsLeonB/cocoon-protos/gen/go/profile"
+	"github.com/itsLeonB/cocoon-protos/gen/go/profile/v1"
 	"github.com/itsLeonB/cocoon/internal/delivery/grpc/mapper"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/service"
@@ -28,7 +28,7 @@ func NewProfileServer(
 	}
 }
 
-func (ps *ProfileServer) Get(ctx context.Context, req *profile.ProfileRequest) (*profile.ProfileResponse, error) {
+func (ps *ProfileServer) Get(ctx context.Context, req *profile.GetRequest) (*profile.GetResponse, error) {
 	id, err := uuid.Parse(req.GetProfileId())
 	if err != nil {
 		return nil, ezutil.ValidationError("profile_id is not a valid uuid")
@@ -39,10 +39,12 @@ func (ps *ProfileServer) Get(ctx context.Context, req *profile.ProfileRequest) (
 		return nil, err
 	}
 
-	return mapper.ToProfileProto(prof), nil
+	return &profile.GetResponse{
+		Profile: mapper.ToProfileProto(prof),
+	}, nil
 }
 
-func (ps *ProfileServer) Create(ctx context.Context, req *profile.NewProfileRequest) (*profile.ProfileResponse, error) {
+func (ps *ProfileServer) Create(ctx context.Context, req *profile.CreateRequest) (*profile.CreateResponse, error) {
 	var userID uuid.UUID
 	if req.GetUserId() != "" {
 		parsedID, err := ezutil.Parse[uuid.UUID](req.GetUserId())
@@ -66,7 +68,9 @@ func (ps *ProfileServer) Create(ctx context.Context, req *profile.NewProfileRequ
 		return nil, err
 	}
 
-	return mapper.ToProfileProto(createdProfile), nil
+	return &profile.CreateResponse{
+		Profile: mapper.ToProfileProto(createdProfile),
+	}, nil
 }
 
 func (ps *ProfileServer) GetNames(ctx context.Context, req *profile.GetNamesRequest) (*profile.GetNamesResponse, error) {

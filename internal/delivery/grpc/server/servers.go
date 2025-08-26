@@ -2,9 +2,9 @@ package server
 
 import (
 	"github.com/go-playground/validator/v10"
-	"github.com/itsLeonB/cocoon-protos/gen/go/auth"
-	"github.com/itsLeonB/cocoon-protos/gen/go/friendship"
-	"github.com/itsLeonB/cocoon-protos/gen/go/profile"
+	"github.com/itsLeonB/cocoon-protos/gen/go/auth/v1"
+	"github.com/itsLeonB/cocoon-protos/gen/go/friendship/v1"
+	"github.com/itsLeonB/cocoon-protos/gen/go/profile/v1"
 	"github.com/itsLeonB/cocoon/internal/provider"
 )
 

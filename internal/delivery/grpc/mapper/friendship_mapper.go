@@ -1,7 +1,7 @@
 package mapper
 
 import (
-	"github.com/itsLeonB/cocoon-protos/gen/go/friendship"
+	"github.com/itsLeonB/cocoon-protos/gen/go/friendship/v1"
 	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"google.golang.org/protobuf/types/known/timestamppb"

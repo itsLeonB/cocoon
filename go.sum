@@ -46,8 +46,8 @@ github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/itsLeonB/cocoon-protos v0.7.0-alpha h1:ge65HxTlc4jj9ipJrLCi1Hcvm/Vmpur8BEDaciqDHKA=
-github.com/itsLeonB/cocoon-protos v0.7.0-alpha/go.mod h1:m3r/5cvVq47/JJsU9zHMiyvDxz4w+nzPbiS2shq47Uo=
+github.com/itsLeonB/cocoon-protos v1.0.0-alpha h1:vTS+zNGoIK/W6TO2aEOkldEX9iIPNnqpCIR4ULf1NEQ=
+github.com/itsLeonB/cocoon-protos v1.0.0-alpha/go.mod h1:m3r/5cvVq47/JJsU9zHMiyvDxz4w+nzPbiS2shq47Uo=
 github.com/itsLeonB/ezutil v1.2.0 h1:JDW2zyGIY3r8s9RkkjTJ1EcsCfXNTk8JyNieG15Xd3Q=
 github.com/itsLeonB/ezutil v1.2.0/go.mod h1:cng4/NOjfb0wSi+pw0DIq1la+is2fynjvBHuBSGTB4w=
 github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsIM=
