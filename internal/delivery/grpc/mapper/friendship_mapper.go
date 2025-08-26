@@ -10,7 +10,7 @@ import (
 func ToFriendshipProto(res dto.FriendshipResponse) *friendship.FriendshipResponse {
 	return &friendship.FriendshipResponse{
 		Id:          res.ID.String(),
-		Type:        ToFriendshipTypeEnum(res.Type),
+		Type:        ToProtoFriendshipType(res.Type),
 		ProfileId:   res.ProfileID.String(),
 		ProfileName: res.ProfileName,
 		CreatedAt:   timestamppb.New(res.CreatedAt),
@@ -19,6 +19,13 @@ func ToFriendshipProto(res dto.FriendshipResponse) *friendship.FriendshipRespons
 	}
 }
 
-func ToFriendshipTypeEnum(friendshipType appconstant.FriendshipType) friendship.FriendshipType {
-	return friendship.FriendshipType(friendship.FriendshipType_value[string(friendshipType)])
+func ToProtoFriendshipType(ft appconstant.FriendshipType) friendship.FriendshipType {
+	switch ft {
+	case appconstant.Real:
+		return friendship.FriendshipType_FRIENDSHIP_TYPE_REAL
+	case appconstant.Anonymous:
+		return friendship.FriendshipType_FRIENDSHIP_TYPE_ANON
+	default:
+		return friendship.FriendshipType_FRIENDSHIP_TYPE_UNSPECIFIED
+	}
 }

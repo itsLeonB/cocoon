@@ -88,7 +88,7 @@ func (fs *FriendshipServer) GetDetails(ctx context.Context, req *friendship.GetD
 		Id:         response.ID.String(),
 		ProfileId:  response.ProfileID.String(),
 		Name:       response.Name,
-		Type:       mapper.ToFriendshipTypeEnum(response.Type),
+		Type:       mapper.ToProtoFriendshipType(response.Type),
 		Email:      response.Email,
 		Phone:      response.Phone,
 		Avatar:     response.Avatar,
