@@ -20,6 +20,7 @@ proto
 .env.*
 *.pem
 *.key
+.secrets
 
 # Docs
 *.md

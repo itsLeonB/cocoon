@@ -129,6 +129,7 @@ func (as *authServiceImpl) VerifyToken(ctx context.Context, token string) (dto.A
 
 	spec := ezutil.Specification[entity.User]{}
 	spec.Model.ID = userID
+	spec.PreloadRelations = []string{"Profile"}
 	user, err := as.userRepository.FindFirst(ctx, spec)
 	if err != nil {
 		return dto.AuthData{}, err
