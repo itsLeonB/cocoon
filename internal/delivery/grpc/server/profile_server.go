@@ -89,3 +89,19 @@ func (ps *ProfileServer) GetNames(ctx context.Context, req *profile.GetNamesRequ
 		NamesByProfileId: namesByProfileID,
 	}, nil
 }
+
+func (ps *ProfileServer) GetByIDs(ctx context.Context, req *profile.GetByIDsRequest) (*profile.GetByIDsResponse, error) {
+	profileIDs, err := ezutil.MapSliceWithError(req.GetProfileIds(), ezutil.Parse[uuid.UUID])
+	if err != nil {
+		return nil, err
+	}
+
+	profiles, err := ps.profileService.GetByIDs(ctx, profileIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	responses := ezutil.MapSlice(profiles, mapper.ToProfileProto)
+
+	return &profile.GetByIDsResponse{Profiles: responses}, nil
+}

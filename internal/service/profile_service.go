@@ -79,3 +79,12 @@ func (ps *profileServiceImpl) GetNames(ctx context.Context, ids []uuid.UUID) (ma
 
 	return nameMap, nil
 }
+
+func (ps *profileServiceImpl) GetByIDs(ctx context.Context, ids []uuid.UUID) ([]dto.ProfileResponse, error) {
+	profiles, err := ps.profileRepo.FindByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	return ezutil.MapSlice(profiles, mapper.ProfileToResponse), nil
+}
