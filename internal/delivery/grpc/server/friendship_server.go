@@ -109,12 +109,13 @@ func (fs *FriendshipServer) IsFriends(ctx context.Context, req *friendship.IsFri
 		return nil, err
 	}
 
-	isFriends, err := fs.friendshipService.IsFriends(ctx, profileID1, profileID2)
+	isFriends, isAnonymous, err := fs.friendshipService.IsFriends(ctx, profileID1, profileID2)
 	if err != nil {
 		return nil, err
 	}
 
 	return &friendship.IsFriendsResponse{
-		IsFriends: isFriends,
+		IsFriends:   isFriends,
+		IsAnonymous: isAnonymous,
 	}, nil
 }

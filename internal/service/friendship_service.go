@@ -104,17 +104,17 @@ func (fs *friendshipServiceImpl) GetDetails(ctx context.Context, profileID, frie
 	return mapper.MapToFriendDetails(profile.ID, friendship)
 }
 
-func (fs *friendshipServiceImpl) IsFriends(ctx context.Context, profileID1, profileID2 uuid.UUID) (bool, error) {
+func (fs *friendshipServiceImpl) IsFriends(ctx context.Context, profileID1, profileID2 uuid.UUID) (bool, bool, error) {
 	friendship, err := fs.friendshipRepository.FindByProfileIDs(ctx, profileID1, profileID2)
 	if err != nil {
-		return false, err
+		return false, false, err
 	}
 
 	if friendship.IsZero() || friendship.IsDeleted() {
-		return false, nil
+		return false, false, nil
 	}
 
-	return true, nil
+	return true, friendship.Type == appconstant.Anonymous, nil
 }
 
 func (fs *friendshipServiceImpl) validateExistingAnonymousFriendship(
