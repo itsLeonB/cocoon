@@ -15,7 +15,7 @@ func ToFriendshipProto(res dto.FriendshipResponse) *friendship.FriendshipRespons
 		ProfileName: res.ProfileName,
 		CreatedAt:   timestamppb.New(res.CreatedAt),
 		UpdatedAt:   timestamppb.New(res.UpdatedAt),
-		DeletedAt:   timestamppb.New(res.DeletedAt),
+		DeletedAt:   NullableTimeToProto(res.DeletedAt),
 	}
 }
 

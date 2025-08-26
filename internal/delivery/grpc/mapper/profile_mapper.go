@@ -13,7 +13,7 @@ func ToProfileProto(res dto.ProfileResponse) *profile.ProfileResponse {
 		Name:        res.Name,
 		CreatedAt:   timestamppb.New(res.CreatedAt),
 		UpdatedAt:   timestamppb.New(res.UpdatedAt),
-		DeletedAt:   timestamppb.New(res.DeletedAt),
+		DeletedAt:   NullableTimeToProto(res.DeletedAt),
 		IsAnonymous: res.IsAnonymous,
 	}
 }

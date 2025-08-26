@@ -94,7 +94,7 @@ func (fs *FriendshipServer) GetDetails(ctx context.Context, req *friendship.GetD
 		Avatar:     response.Avatar,
 		CreatedAt:  timestamppb.New(response.CreatedAt),
 		UpdatedAt:  timestamppb.New(response.UpdatedAt),
-		DeletedAt:  timestamppb.New(response.DeletedAt),
+		DeletedAt:  mapper.NullableTimeToProto(response.DeletedAt),
 		ProfileId1: response.ProfileID1.String(),
 		ProfileId2: response.ProfileID2.String(),
 	}, nil
