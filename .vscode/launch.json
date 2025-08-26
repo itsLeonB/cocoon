@@ -1,0 +1,13 @@
+{
+    "configurations": [
+        {
+            "name": "Cocoon",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "envFile": "${workspaceFolder}/.env",
+            "program": "${workspaceFolder}/cmd/grpc/main.go",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
