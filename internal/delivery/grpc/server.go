@@ -35,6 +35,7 @@ func Setup(configs config.Config) *Server {
 	}
 
 	return &Server{
+		logger:       providers.Logger,
 		address:      ":" + configs.App.Port,
 		opts:         opts,
 		servers:      servers,
