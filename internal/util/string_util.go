@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/ezutil/v2"
 )
 
 func GetNameFromEmail(email string) string {

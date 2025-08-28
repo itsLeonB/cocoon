@@ -6,19 +6,19 @@ import (
 	"github.com/google/uuid"
 	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/entity"
-	"github.com/itsLeonB/ezutil"
+	crud "github.com/itsLeonB/go-crud"
 	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
 )
 
 type profileRepositoryGorm struct {
-	ezutil.CRUDRepository[entity.UserProfile]
+	crud.CRUDRepository[entity.UserProfile]
 	db *gorm.DB
 }
 
 func NewProfileRepository(db *gorm.DB) UserProfileRepository {
 	return &profileRepositoryGorm{
-		ezutil.NewCRUDRepository[entity.UserProfile](db),
+		crud.NewCRUDRepository[entity.UserProfile](db),
 		db,
 	}
 }
@@ -26,7 +26,7 @@ func NewProfileRepository(db *gorm.DB) UserProfileRepository {
 func (pr *profileRepositoryGorm) FindByIDs(ctx context.Context, ids []uuid.UUID) ([]entity.UserProfile, error) {
 	var profiles []entity.UserProfile
 
-	db, err := pr.CRUDRepository.GetGormInstance(ctx)
+	db, err := pr.GetGormInstance(ctx)
 	if err != nil {
 		return nil, err
 	}

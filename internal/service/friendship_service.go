@@ -10,17 +10,19 @@ import (
 	"github.com/itsLeonB/cocoon/internal/entity"
 	"github.com/itsLeonB/cocoon/internal/mapper"
 	"github.com/itsLeonB/cocoon/internal/repository"
-	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/ezutil/v2"
+	crud "github.com/itsLeonB/go-crud"
+	"github.com/itsLeonB/ungerr"
 )
 
 type friendshipServiceImpl struct {
-	transactor           ezutil.Transactor
+	transactor           crud.Transactor
 	friendshipRepository repository.FriendshipRepository
 	profileService       ProfileService
 }
 
 func NewFriendshipService(
-	transactor ezutil.Transactor,
+	transactor crud.Transactor,
 	friendshipRepository repository.FriendshipRepository,
 	profileService ProfileService,
 ) FriendshipService {
@@ -98,7 +100,7 @@ func (fs *friendshipServiceImpl) GetDetails(ctx context.Context, profileID, frie
 		return dto.FriendDetails{}, err
 	}
 	if friendship.IsZero() {
-		return dto.FriendDetails{}, ezutil.NotFoundError(appconstant.ErrFriendshipNotFound)
+		return dto.FriendDetails{}, ungerr.NotFoundError(appconstant.ErrFriendshipNotFound)
 	}
 
 	return mapper.MapToFriendDetails(profile.ID, friendship)
@@ -132,7 +134,7 @@ func (fs *friendshipServiceImpl) validateExistingAnonymousFriendship(
 		return err
 	}
 	if !existingFriendship.IsZero() && !existingFriendship.IsDeleted() {
-		return ezutil.ConflictError(fmt.Sprintf("anonymous friend named %s already exists", friendName))
+		return ungerr.ConflictError(fmt.Sprintf("anonymous friend named %s already exists", friendName))
 	}
 
 	return nil
