@@ -9,7 +9,8 @@ import (
 	"github.com/itsLeonB/cocoon/internal/delivery/grpc/mapper"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/service"
-	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/ezutil/v2"
+	"github.com/itsLeonB/ungerr"
 )
 
 type ProfileServer struct {
@@ -31,7 +32,7 @@ func NewProfileServer(
 func (ps *ProfileServer) Get(ctx context.Context, req *profile.GetRequest) (*profile.GetResponse, error) {
 	id, err := uuid.Parse(req.GetProfileId())
 	if err != nil {
-		return nil, ezutil.ValidationError("profile_id is not a valid uuid")
+		return nil, ungerr.ValidationError("profile_id is not a valid uuid")
 	}
 
 	prof, err := ps.profileService.GetByID(ctx, id)

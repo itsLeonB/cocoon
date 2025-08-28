@@ -3,7 +3,7 @@ package entity
 import (
 	"github.com/google/uuid"
 	"github.com/itsLeonB/cocoon/internal/appconstant"
-	"github.com/itsLeonB/ezutil"
+	crud "github.com/itsLeonB/go-crud"
 )
 
 type Friendship struct {
@@ -16,6 +16,6 @@ type Friendship struct {
 }
 
 type FriendshipSpecification struct {
-	ezutil.Specification[Friendship]
+	crud.Specification[Friendship]
 	Name string
 }

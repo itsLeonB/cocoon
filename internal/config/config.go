@@ -1,39 +1,44 @@
 package config
 
 import (
-	"log"
 	"time"
 
-	"github.com/itsLeonB/ezutil"
+	"github.com/kelseyhightower/envconfig"
 )
 
-func DefaultConfigs() ezutil.Config {
-	timeout, _ := time.ParseDuration("10s")
-	tokenDuration, _ := time.ParseDuration("24h")
-	cookieDuration, _ := time.ParseDuration("24h")
-	secretKey, err := ezutil.GenerateRandomString(32)
-	if err != nil {
-		log.Fatal("error generating secret key: %w", err)
-	}
+type Config struct {
+	App
+	Auth
+	DB
+}
 
-	appConfig := ezutil.App{
-		Env:        "debug",
-		Port:       "8080",
-		Timeout:    timeout,
-		ClientUrls: []string{"http://localhost:3000"},
-		Timezone:   "Asia/Jakarta",
-	}
+type App struct {
+	Name    string        `default:"Cocoon"`
+	Env     string        `default:"debug"`
+	Port    string        `default:"50051"`
+	Timeout time.Duration `default:"10s"`
+}
 
-	authConfig := ezutil.Auth{
-		SecretKey:      secretKey,
-		TokenDuration:  tokenDuration,
-		CookieDuration: cookieDuration,
-		Issuer:         "cocoon",
-		URL:            "http://localhost:8000",
-	}
+type Auth struct {
+	SecretKey     string        `split_words:"true" default:"thisissecret"`
+	TokenDuration time.Duration `split_words:"true" default:"24h"`
+	Issuer        string        `default:"cocoon"`
+	HashCost      int           `split_words:"true" default:"10"`
+}
 
-	return ezutil.Config{
-		App:  &appConfig,
-		Auth: &authConfig,
+func Load() Config {
+	var app App
+	envconfig.MustProcess("APP", &app)
+
+	var auth Auth
+	envconfig.MustProcess("AUTH", &auth)
+
+	var db DB
+	envconfig.MustProcess("DB", &db)
+
+	return Config{
+		App:  app,
+		Auth: auth,
+		DB:   db,
 	}
 }

@@ -6,25 +6,25 @@ import (
 	"github.com/google/uuid"
 	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/entity"
-	"github.com/itsLeonB/ezutil"
+	crud "github.com/itsLeonB/go-crud"
 	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
 )
 
 type friendshipRepositoryGorm struct {
-	ezutil.CRUDRepository[entity.Friendship]
+	crud.CRUDRepository[entity.Friendship]
 	db *gorm.DB
 }
 
 func NewFriendshipRepository(db *gorm.DB) FriendshipRepository {
 	return &friendshipRepositoryGorm{
-		ezutil.NewCRUDRepository[entity.Friendship](db),
+		crud.NewCRUDRepository[entity.Friendship](db),
 		db,
 	}
 }
 
 func (fr *friendshipRepositoryGorm) Insert(ctx context.Context, friendship entity.Friendship) (entity.Friendship, error) {
-	db, err := fr.getGormInstance(ctx)
+	db, err := fr.GetGormInstance(ctx)
 	if err != nil {
 		return entity.Friendship{}, err
 	}
@@ -39,15 +39,15 @@ func (fr *friendshipRepositoryGorm) Insert(ctx context.Context, friendship entit
 func (fr *friendshipRepositoryGorm) FindFirstBySpec(ctx context.Context, spec entity.FriendshipSpecification) (entity.Friendship, error) {
 	var friendship entity.Friendship
 
-	db, err := fr.getGormInstance(ctx)
+	db, err := fr.GetGormInstance(ctx)
 	if err != nil {
 		return entity.Friendship{}, err
 	}
 
 	query := db.
 		Scopes(
-			ezutil.WhereBySpec(spec.Model),
-			ezutil.PreloadRelations(spec.PreloadRelations),
+			crud.WhereBySpec(spec.Model),
+			crud.PreloadRelations(spec.PreloadRelations),
 		).
 		Joins("JOIN user_profiles AS up1 ON up1.id = friendships.profile_id1").
 		Joins("JOIN user_profiles AS up2 ON up2.id = friendships.profile_id2")
@@ -73,7 +73,7 @@ func (fr *friendshipRepositoryGorm) FindFirstBySpec(ctx context.Context, spec en
 func (fr *friendshipRepositoryGorm) FindAllBySpec(ctx context.Context, spec entity.FriendshipSpecification) ([]entity.Friendship, error) {
 	var friendships []entity.Friendship
 
-	db, err := fr.getGormInstance(ctx)
+	db, err := fr.GetGormInstance(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -82,8 +82,8 @@ func (fr *friendshipRepositoryGorm) FindAllBySpec(ctx context.Context, spec enti
 		Where(entity.Friendship{ProfileID1: spec.Model.ProfileID1}).
 		Or(entity.Friendship{ProfileID2: spec.Model.ProfileID1}).
 		Scopes(
-			ezutil.PreloadRelations(spec.PreloadRelations),
-			ezutil.DefaultOrder(),
+			crud.PreloadRelations(spec.PreloadRelations),
+			crud.DefaultOrder(),
 		).
 		Find(&friendships).
 		Error
@@ -96,7 +96,7 @@ func (fr *friendshipRepositoryGorm) FindAllBySpec(ctx context.Context, spec enti
 }
 
 func (fr *friendshipRepositoryGorm) FindByProfileIDs(ctx context.Context, profileID1, profileID2 uuid.UUID) (entity.Friendship, error) {
-	db, err := fr.getGormInstance(ctx)
+	db, err := fr.GetGormInstance(ctx)
 	if err != nil {
 		return entity.Friendship{}, err
 	}
@@ -114,16 +114,4 @@ func (fr *friendshipRepositoryGorm) FindByProfileIDs(ctx context.Context, profil
 	}
 
 	return friendship, nil
-}
-
-func (fr *friendshipRepositoryGorm) getGormInstance(ctx context.Context) (*gorm.DB, error) {
-	tx, err := ezutil.GetTxFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if tx != nil {
-		return tx, nil
-	}
-
-	return fr.db.WithContext(ctx), nil
 }

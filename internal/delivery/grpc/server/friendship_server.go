@@ -9,7 +9,7 @@ import (
 	"github.com/itsLeonB/cocoon/internal/delivery/grpc/mapper"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/service"
-	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/ezutil/v2"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

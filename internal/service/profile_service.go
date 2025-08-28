@@ -9,16 +9,18 @@ import (
 	"github.com/itsLeonB/cocoon/internal/entity"
 	"github.com/itsLeonB/cocoon/internal/mapper"
 	"github.com/itsLeonB/cocoon/internal/repository"
-	"github.com/itsLeonB/ezutil"
+	"github.com/itsLeonB/ezutil/v2"
+	crud "github.com/itsLeonB/go-crud"
+	"github.com/itsLeonB/ungerr"
 )
 
 type profileServiceImpl struct {
-	transactor  ezutil.Transactor
+	transactor  crud.Transactor
 	profileRepo repository.UserProfileRepository
 }
 
 func NewProfileService(
-	transactor ezutil.Transactor,
+	transactor crud.Transactor,
 	profileRepo repository.UserProfileRepository,
 ) ProfileService {
 	return &profileServiceImpl{
@@ -50,17 +52,17 @@ func (ps *profileServiceImpl) Create(ctx context.Context, request dto.NewProfile
 }
 
 func (ps *profileServiceImpl) GetByID(ctx context.Context, id uuid.UUID) (dto.ProfileResponse, error) {
-	spec := ezutil.Specification[entity.UserProfile]{}
+	spec := crud.Specification[entity.UserProfile]{}
 	spec.Model.ID = id
 	profile, err := ps.profileRepo.FindFirst(ctx, spec)
 	if err != nil {
 		return dto.ProfileResponse{}, err
 	}
 	if profile.IsZero() {
-		return dto.ProfileResponse{}, ezutil.NotFoundError(fmt.Sprintf("profile with ID: %s is not found", id))
+		return dto.ProfileResponse{}, ungerr.NotFoundError(fmt.Sprintf("profile with ID: %s is not found", id))
 	}
 	if profile.IsDeleted() {
-		return dto.ProfileResponse{}, ezutil.ConflictError(fmt.Sprintf("profile with ID: %s is already deleted", id))
+		return dto.ProfileResponse{}, ungerr.ConflictError(fmt.Sprintf("profile with ID: %s is already deleted", id))
 	}
 
 	return mapper.ProfileToResponse(profile), nil
