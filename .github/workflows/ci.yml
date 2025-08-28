@@ -20,26 +20,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Setup Go with cache
+        uses: ./.github/actions/setup-go
         with:
           go-version-file: "go.mod"
 
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('go.mod') }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-${{ hashFiles('go.mod') }}-
-
-      - name: Download dependencies
-        run: go mod download
-
       - name: Verify dependencies
-        run: go mod verify
+        run: |
+          go mod verify
+          cd test && go mod verify
 
       - name: Run tests
         run: make test-coverage
@@ -62,26 +51,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Setup Go with cache
+        uses: ./.github/actions/setup-go
         with:
           go-version-file: "go.mod"
 
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('go.mod') }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-${{ hashFiles('go.mod') }}-
-
-      - name: Download dependencies
-        run: go mod download
-
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v8
         with:
           version: latest
           args: --timeout=5m
@@ -94,26 +70,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Setup Go with cache
+        uses: ./.github/actions/setup-go
         with:
           go-version-file: "go.mod"
 
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('go.mod') }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-${{ hashFiles('go.mod') }}-
-
-      - name: Download dependencies
-        run: go mod download
-
       - name: Build
         run: go build -v ./...
+
+      - name: Build test package
+        run: cd test && go build -v ./...
 
   security:
     name: Security Scan
@@ -123,23 +89,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Setup Go with cache
+        uses: ./.github/actions/setup-go
         with:
           go-version-file: "go.mod"
-
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('go.mod') }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-${{ hashFiles('go.mod') }}-
-
-      - name: Download dependencies
-        run: go mod download
 
       - name: Install and Run Gosec
         run: |
