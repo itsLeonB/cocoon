@@ -14,8 +14,8 @@ github.com/go-playground/locales v0.14.1 h1:EWaQ/wswjilfKLTECiXz7Rh+3BjFhfDFKv/o
 github.com/go-playground/locales v0.14.1/go.mod h1:hxrqLVvrK65+Rwrd5Fc6F2O76J/NuW9t0sjnWqG1slY=
 github.com/go-playground/universal-translator v0.18.1 h1:Bcnm0ZwsGyWbCzImXv+pAJnYK9S473LQFuzCbDbfSFY=
 github.com/go-playground/universal-translator v0.18.1/go.mod h1:xekY+UJKNuX9WP91TpwSH2VMlDf28Uj24BCp08ZFTUY=
-github.com/go-playground/validator/v10 v10.26.0 h1:SP05Nqhjcvz81uJaRfEV0YBSSSGMc/iMaVtFbr3Sw2k=
-github.com/go-playground/validator/v10 v10.26.0/go.mod h1:I5QpIEbmr8On7W0TktmJAumgzX4CA1XNl4ZmDuVHKKo=
+github.com/go-playground/validator/v10 v10.27.0 h1:w8+XrWVMhGkxOaaowyKH35gFydVHOvC0/uWoy2Fzwn4=
+github.com/go-playground/validator/v10 v10.27.0/go.mod h1:I5QpIEbmr8On7W0TktmJAumgzX4CA1XNl4ZmDuVHKKo=
 github.com/golang-jwt/jwt/v5 v5.3.0 h1:pv4AsKCKKZuqlgs5sUmn4x8UlGa0kEVt/puTpKx9vvo=
 github.com/golang-jwt/jwt/v5 v5.3.0/go.mod h1:fxCRLWMO43lRc8nhHWY6LGqRcf+1gQWArsqaEUEa5bE=
 github.com/golang/protobuf v1.5.4 h1:i7eJL8qZTpSEXOPTxNKhASYpMn+8e5Q6AdndVa1dWek=
@@ -28,6 +28,8 @@ github.com/itsLeonB/cocoon-protos v1.0.0 h1:r4RMqDBT2bYUxVdS1ocnYk6XVnW0gwqK2Uc0
 github.com/itsLeonB/cocoon-protos v1.0.0/go.mod h1:m3r/5cvVq47/JJsU9zHMiyvDxz4w+nzPbiS2shq47Uo=
 github.com/itsLeonB/ezutil/v2 v2.0.0 h1:4o6nVMzCIr56ggXifDG7Mr+ucDDUg3bVeuiNjsFVcRI=
 github.com/itsLeonB/ezutil/v2 v2.0.0/go.mod h1:fiUusldH3h+Y3vYimdloT+CBVO2AKT0xEtXvSHgvTts=
+github.com/itsLeonB/gerpc v0.1.0 h1:U7iTN5eztyczBUrOpNiPah6yx3XrrBRZIBkZqn16eE8=
+github.com/itsLeonB/gerpc v0.1.0/go.mod h1:oS2CfSf50EA6Oy2NspcaobmjK6uBULhDUheUkH+0YVw=
 github.com/itsLeonB/go-crud v0.1.0 h1:259P+q3G/GyeGwiTpbJFOzUb22zVcir2qrVKca+Njg4=
 github.com/itsLeonB/go-crud v0.1.0/go.mod h1:JaYnmLkF0rJwIO6/ck17G6twmEm5/KVknhXES82Zd0s=
 github.com/itsLeonB/sekure v0.1.0 h1:e39zQNRs/UNyTEDOP2//H3OUBs6AYicCZtfkVTIPlto=
@@ -65,8 +67,8 @@ github.com/rotisserie/eris v0.5.4/go.mod h1:Z/kgYTJiJtocxCbFfvRmO+QejApzG6zpyky9
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/stretchr/testify v1.11.0 h1:ib4sjIrwZKxE5u/Japgo/7SJV3PvgjGiRNAvTVGqQl8=
-github.com/stretchr/testify v1.11.0/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
+github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
+github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
 go.opentelemetry.io/auto/sdk v1.1.0/go.mod h1:3wSPjt5PWp2RhlCcmmOial7AvC4DQqZb7a7wCow3W8A=
 go.opentelemetry.io/otel v1.37.0 h1:9zhNfelUvx0KBfu/gb+ZgeAfAgtWrfHJZcAqFC228wQ=
