@@ -6,6 +6,7 @@ import (
 	"github.com/itsLeonB/cocoon-protos/gen/go/friendship/v1"
 	"github.com/itsLeonB/cocoon-protos/gen/go/profile/v1"
 	"github.com/itsLeonB/cocoon/internal/provider"
+	"google.golang.org/grpc"
 )
 
 type Servers struct {
@@ -22,4 +23,11 @@ func ProvideServers(services *provider.Services) *Servers {
 		Profile:    NewProfileServer(validate, services.Profile),
 		Friendship: NewFriendshipServer(validate, services.Friendship),
 	}
+}
+
+func (s *Servers) Register(grpcServer *grpc.Server) error {
+	auth.RegisterAuthServiceServer(grpcServer, s.Auth)
+	profile.RegisterProfileServiceServer(grpcServer, s.Profile)
+	friendship.RegisterFriendshipServiceServer(grpcServer, s.Friendship)
+	return nil
 }
