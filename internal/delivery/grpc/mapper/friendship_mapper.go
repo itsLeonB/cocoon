@@ -4,6 +4,7 @@ import (
 	"github.com/itsLeonB/cocoon-protos/gen/go/friendship/v1"
 	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/dto"
+	"github.com/itsLeonB/gerpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -15,7 +16,7 @@ func ToFriendshipProto(res dto.FriendshipResponse) *friendship.FriendshipRespons
 		ProfileName: res.ProfileName,
 		CreatedAt:   timestamppb.New(res.CreatedAt),
 		UpdatedAt:   timestamppb.New(res.UpdatedAt),
-		DeletedAt:   NullableTimeToProto(res.DeletedAt),
+		DeletedAt:   gerpc.NullableTimeToProto(res.DeletedAt),
 	}
 }
 

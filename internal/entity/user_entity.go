@@ -1,7 +1,9 @@
 package entity
 
+import "github.com/itsLeonB/go-crud"
+
 type User struct {
-	BaseEntity
+	crud.BaseEntity
 	Email    string
 	Password string
 	Profile  UserProfile

@@ -10,6 +10,7 @@ import (
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/service"
 	"github.com/itsLeonB/ezutil/v2"
+	"github.com/itsLeonB/gerpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -94,7 +95,7 @@ func (fs *FriendshipServer) GetDetails(ctx context.Context, req *friendship.GetD
 		Avatar:     response.Avatar,
 		CreatedAt:  timestamppb.New(response.CreatedAt),
 		UpdatedAt:  timestamppb.New(response.UpdatedAt),
-		DeletedAt:  mapper.NullableTimeToProto(response.DeletedAt),
+		DeletedAt:  gerpc.NullableTimeToProto(response.DeletedAt),
 		ProfileId1: response.ProfileID1.String(),
 		ProfileId2: response.ProfileID2.String(),
 	}, nil

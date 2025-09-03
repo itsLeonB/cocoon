@@ -7,7 +7,7 @@ import (
 )
 
 type Friendship struct {
-	BaseEntity
+	crud.BaseEntity
 	ProfileID1 uuid.UUID
 	ProfileID2 uuid.UUID
 	Type       appconstant.FriendshipType
