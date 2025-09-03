@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"github.com/itsLeonB/cocoon/internal/config"
-	"github.com/itsLeonB/cocoon/internal/delivery/grpc/interceptor"
 	"github.com/itsLeonB/cocoon/internal/delivery/grpc/server"
 	"github.com/itsLeonB/cocoon/internal/provider"
 	"github.com/itsLeonB/gerpc"
@@ -16,8 +15,8 @@ func Setup(configs config.Config) *gerpc.GrpcServer {
 	// Middlewares/Interceptors
 	opts := []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(
-			interceptor.NewLoggerInterceptor(providers.Logger),
-			interceptor.NewErrorInterceptor(providers.Logger),
+			gerpc.NewLoggingInterceptor(providers.Logger),
+			gerpc.NewErrorInterceptor(providers.Logger),
 		),
 	}
 

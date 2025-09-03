@@ -10,6 +10,7 @@ import (
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/service"
 	"github.com/itsLeonB/ezutil/v2"
+	"github.com/itsLeonB/gerpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -49,8 +50,13 @@ func (fs *FriendshipServer) CreateAnonymous(ctx context.Context, req *friendship
 		return nil, err
 	}
 
+	friendshipResp, err := mapper.ToFriendshipProto(response)
+	if err != nil {
+		return nil, err
+	}
+
 	return &friendship.CreateAnonymousResponse{
-		Friendship: mapper.ToFriendshipProto(response),
+		Friendship: friendshipResp,
 	}, nil
 }
 
@@ -65,7 +71,12 @@ func (fs *FriendshipServer) GetAll(ctx context.Context, req *friendship.GetAllRe
 		return nil, err
 	}
 
-	return &friendship.GetAllResponse{Friendships: ezutil.MapSlice(response, mapper.ToFriendshipProto)}, nil
+	friendships, err := ezutil.MapSliceWithError(response, mapper.ToFriendshipProto)
+	if err != nil {
+		return nil, err
+	}
+
+	return &friendship.GetAllResponse{Friendships: friendships}, nil
 }
 
 func (fs *FriendshipServer) GetDetails(ctx context.Context, req *friendship.GetDetailsRequest) (*friendship.GetDetailsResponse, error) {
@@ -84,17 +95,22 @@ func (fs *FriendshipServer) GetDetails(ctx context.Context, req *friendship.GetD
 		return nil, err
 	}
 
+	friendshipType, err := mapper.ToProtoFriendshipType(response.Type)
+	if err != nil {
+		return nil, err
+	}
+
 	return &friendship.GetDetailsResponse{
 		Id:         response.ID.String(),
 		ProfileId:  response.ProfileID.String(),
 		Name:       response.Name,
-		Type:       mapper.ToProtoFriendshipType(response.Type),
+		Type:       friendshipType,
 		Email:      response.Email,
 		Phone:      response.Phone,
 		Avatar:     response.Avatar,
 		CreatedAt:  timestamppb.New(response.CreatedAt),
 		UpdatedAt:  timestamppb.New(response.UpdatedAt),
-		DeletedAt:  mapper.NullableTimeToProto(response.DeletedAt),
+		DeletedAt:  gerpc.NullableTimeToProto(response.DeletedAt),
 		ProfileId1: response.ProfileID1.String(),
 		ProfileId2: response.ProfileID2.String(),
 	}, nil
