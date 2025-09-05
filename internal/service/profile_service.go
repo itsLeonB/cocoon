@@ -10,7 +10,7 @@ import (
 	"github.com/itsLeonB/cocoon/internal/mapper"
 	"github.com/itsLeonB/cocoon/internal/repository"
 	"github.com/itsLeonB/ezutil/v2"
-	crud "github.com/itsLeonB/go-crud"
+	"github.com/itsLeonB/go-crud"
 	"github.com/itsLeonB/ungerr"
 )
 
@@ -66,20 +66,6 @@ func (ps *profileServiceImpl) GetByID(ctx context.Context, id uuid.UUID) (dto.Pr
 	}
 
 	return mapper.ProfileToResponse(profile), nil
-}
-
-func (ps *profileServiceImpl) GetNames(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]string, error) {
-	profiles, err := ps.profileRepo.FindByIDs(ctx, ids)
-	if err != nil {
-		return nil, err
-	}
-
-	nameMap := make(map[uuid.UUID]string, len(profiles))
-	for _, profile := range profiles {
-		nameMap[profile.ID] = profile.Name
-	}
-
-	return nameMap, nil
 }
 
 func (ps *profileServiceImpl) GetByIDs(ctx context.Context, ids []uuid.UUID) ([]dto.ProfileResponse, error) {
