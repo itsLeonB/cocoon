@@ -5,7 +5,8 @@ go 1.25.0
 require (
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/google/uuid v1.6.0
-	github.com/itsLeonB/cocoon-protos v1.0.0
+	github.com/itsLeonB/audit v0.1.0
+	github.com/itsLeonB/cocoon-protos v1.1.1
 	github.com/itsLeonB/ezutil/v2 v2.1.0
 	github.com/itsLeonB/gerpc v0.2.0
 	github.com/itsLeonB/go-crud v0.2.0
@@ -15,9 +16,11 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/rotisserie/eris v0.5.4
 	github.com/stretchr/testify v1.11.1
+	go.uber.org/mock v0.6.0
 	google.golang.org/grpc v1.75.0
 	google.golang.org/protobuf v1.36.8
 	gorm.io/driver/postgres v1.6.0
+	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.30.1
 )
 
@@ -35,6 +38,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
+	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	golang.org/x/crypto v0.41.0 // indirect
