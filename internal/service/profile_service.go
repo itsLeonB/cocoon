@@ -82,7 +82,9 @@ func (ps *profileServiceImpl) Update(ctx context.Context, req dto.UpdateProfileR
 	err := ps.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
 		spec := crud.Specification[entity.UserProfile]{}
 		spec.Model.ID = req.ID
-		spec.Model.UserID = req.UserID
+		if req.UserID != uuid.Nil {
+			spec.Model.UserID = req.UserID
+		}
 		spec.DeletedFilter = crud.ExcludeDeleted
 		spec.ForUpdate = true
 		profile, err := ps.profileRepo.FindFirst(ctx, spec)

@@ -6,13 +6,11 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/itsLeonB/cocoon-protos/gen/go/profile/v1"
-	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/delivery/grpc/mapper"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/service"
 	"github.com/itsLeonB/ezutil/v2"
 	"github.com/itsLeonB/ungerr"
-	"github.com/rotisserie/eris"
 )
 
 type ProfileServer struct {
@@ -96,10 +94,6 @@ func (ps *ProfileServer) Update(ctx context.Context, req *profile.UpdateRequest)
 	request, err := mapper.FromUpdateProfileRequestProto(req)
 	if err != nil {
 		return nil, err
-	}
-
-	if err := ps.validate.Struct(request); err != nil {
-		return nil, eris.Wrap(err, appconstant.ErrStructValidation)
 	}
 
 	response, err := ps.profileService.Update(ctx, request)

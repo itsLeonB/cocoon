@@ -22,8 +22,8 @@ type NewProfileRequest struct {
 }
 
 type UpdateProfileRequest struct {
-	ID     uuid.UUID `validate:"required"`
+	ID     uuid.UUID
 	UserID uuid.UUID
-	Name   string `validate:"min=1,max=255"`
-	Avatar string `validate:"min=3"`
+	Name   string
+	Avatar string
 }
