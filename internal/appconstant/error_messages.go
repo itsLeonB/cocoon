@@ -13,4 +13,6 @@ const (
 
 	ErrFriendshipNotFound = "friendship not found"
 	ErrFriendshipDeleted  = "friendship is deleted"
+
+	ErrStructValidation = "error validating struct"
 )

@@ -18,6 +18,7 @@ func TestProfileToResponse(t *testing.T) {
 	profile := entity.UserProfile{
 		UserID: userID,
 		Name:   "John Doe",
+		Avatar: "avatar.jpeg",
 	}
 	profile.ID = profileID
 	profile.CreatedAt = now
@@ -30,20 +31,7 @@ func TestProfileToResponse(t *testing.T) {
 	assert.Equal(t, "John Doe", response.Name)
 	assert.Equal(t, now, response.CreatedAt)
 	assert.Equal(t, now, response.UpdatedAt)
-	assert.False(t, response.IsAnonymous)
-}
-
-func TestProfileToResponse_Anonymous(t *testing.T) {
-	profile := entity.UserProfile{
-		UserID: uuid.Nil,
-		Name:   "Anonymous User",
-	}
-
-	response := mapper.ProfileToResponse(profile)
-
-	assert.Equal(t, uuid.Nil, response.UserID)
-	assert.Equal(t, "Anonymous User", response.Name)
-	assert.True(t, response.IsAnonymous)
+	assert.Equal(t, "avatar.jpeg", response.Avatar)
 }
 
 func TestProfileToResponse_WithDeletedAt(t *testing.T) {

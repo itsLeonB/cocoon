@@ -17,7 +17,7 @@ type Repositories struct {
 func ProvideRepositories(db *gorm.DB) *Repositories {
 	return &Repositories{
 		Transactor:  crud.NewTransactor(db),
-		User:        crud.NewCRUDRepository[entity.User](db),
+		User:        crud.NewRepository[entity.User](db),
 		UserProfile: repository.NewProfileRepository(db),
 		Friendship:  repository.NewFriendshipRepository(db),
 	}

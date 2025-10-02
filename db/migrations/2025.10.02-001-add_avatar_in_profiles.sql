@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS user_profiles
+ADD COLUMN avatar TEXT;
