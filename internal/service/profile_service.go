@@ -76,3 +76,41 @@ func (ps *profileServiceImpl) GetByIDs(ctx context.Context, ids []uuid.UUID) ([]
 
 	return ezutil.MapSlice(profiles, mapper.ProfileToResponse), nil
 }
+
+func (ps *profileServiceImpl) Update(ctx context.Context, req dto.UpdateProfileRequest) (dto.ProfileResponse, error) {
+	var response dto.ProfileResponse
+	err := ps.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
+		spec := crud.Specification[entity.UserProfile]{}
+		spec.Model.ID = req.ID
+		if req.UserID != uuid.Nil {
+			spec.Model.UserID = req.UserID
+		}
+		spec.DeletedFilter = crud.ExcludeDeleted
+		spec.ForUpdate = true
+		profile, err := ps.profileRepo.FindFirst(ctx, spec)
+		if err != nil {
+			return err
+		}
+		if profile.IsZero() {
+			return ungerr.NotFoundError(fmt.Sprintf("profile ID: %s is not found", req.ID.String()))
+		}
+
+		if req.UserID != uuid.Nil {
+			profile.UserID = req.UserID
+		}
+		if req.Name != "" {
+			profile.Name = req.Name
+		}
+		if req.Avatar != "" {
+			profile.Avatar = req.Avatar
+		}
+		updatedProfile, err := ps.profileRepo.Update(ctx, profile)
+		if err != nil {
+			return err
+		}
+
+		response = mapper.ProfileToResponse(updatedProfile)
+		return nil
+	})
+	return response, err
+}

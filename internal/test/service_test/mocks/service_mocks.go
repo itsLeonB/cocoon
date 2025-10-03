@@ -155,6 +155,21 @@ func (mr *MockProfileServiceMockRecorder) GetByIDs(ctx, ids any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByIDs", reflect.TypeOf((*MockProfileService)(nil).GetByIDs), ctx, ids)
 }
 
+// Update mocks base method.
+func (m *MockProfileService) Update(ctx context.Context, req dto.UpdateProfileRequest) (dto.ProfileResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", ctx, req)
+	ret0, _ := ret[0].(dto.ProfileResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockProfileServiceMockRecorder) Update(ctx, req any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockProfileService)(nil).Update), ctx, req)
+}
+
 // MockFriendshipService is a mock of FriendshipService interface.
 type MockFriendshipService struct {
 	ctrl     *gomock.Controller

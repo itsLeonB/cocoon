@@ -41,7 +41,7 @@ func (ps *ProfileServer) Get(ctx context.Context, req *profile.GetRequest) (*pro
 	}
 
 	return &profile.GetResponse{
-		Profile: mapper.ToProfileProto(prof),
+		Profile: mapper.ToProfileResponseProto(prof),
 	}, nil
 }
 
@@ -70,7 +70,7 @@ func (ps *ProfileServer) Create(ctx context.Context, req *profile.CreateRequest)
 	}
 
 	return &profile.CreateResponse{
-		Profile: mapper.ToProfileProto(createdProfile),
+		Profile: mapper.ToProfileResponseProto(createdProfile),
 	}, nil
 }
 
@@ -85,7 +85,23 @@ func (ps *ProfileServer) GetByIDs(ctx context.Context, req *profile.GetByIDsRequ
 		return nil, err
 	}
 
-	responses := ezutil.MapSlice(profiles, mapper.ToProfileProto)
+	responses := ezutil.MapSlice(profiles, mapper.ToProfileResponseProto)
 
 	return &profile.GetByIDsResponse{Profiles: responses}, nil
+}
+
+func (ps *ProfileServer) Update(ctx context.Context, req *profile.UpdateRequest) (*profile.UpdateResponse, error) {
+	request, err := mapper.FromUpdateProfileRequestProto(req)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := ps.profileService.Update(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+
+	return &profile.UpdateResponse{
+		Profile: mapper.ToProfileResponseProto(response),
+	}, nil
 }

@@ -6,19 +6,19 @@ import (
 	"github.com/google/uuid"
 	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/entity"
-	crud "github.com/itsLeonB/go-crud"
+	"github.com/itsLeonB/go-crud"
 	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
 )
 
 type friendshipRepositoryGorm struct {
-	crud.CRUDRepository[entity.Friendship]
+	crud.Repository[entity.Friendship]
 	db *gorm.DB
 }
 
 func NewFriendshipRepository(db *gorm.DB) FriendshipRepository {
 	return &friendshipRepositoryGorm{
-		crud.NewCRUDRepository[entity.Friendship](db),
+		crud.NewRepository[entity.Friendship](db),
 		db,
 	}
 }

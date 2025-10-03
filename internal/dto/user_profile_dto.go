@@ -7,16 +7,23 @@ import (
 )
 
 type ProfileResponse struct {
-	ID          uuid.UUID `json:"id"`
-	UserID      uuid.UUID `json:"userId"`
-	Name        string    `json:"name"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
-	DeletedAt   time.Time `json:"deletedAt,omitzero"`
-	IsAnonymous bool
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	Name      string
+	Avatar    string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
 }
 
 type NewProfileRequest struct {
 	UserID uuid.UUID
 	Name   string `validate:"required,min=1,max=255"`
+}
+
+type UpdateProfileRequest struct {
+	ID     uuid.UUID
+	UserID uuid.UUID
+	Name   string
+	Avatar string
 }

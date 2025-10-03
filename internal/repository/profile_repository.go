@@ -6,19 +6,19 @@ import (
 	"github.com/google/uuid"
 	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/entity"
-	crud "github.com/itsLeonB/go-crud"
+	"github.com/itsLeonB/go-crud"
 	"github.com/rotisserie/eris"
 	"gorm.io/gorm"
 )
 
 type profileRepositoryGorm struct {
-	crud.CRUDRepository[entity.UserProfile]
+	crud.Repository[entity.UserProfile]
 	db *gorm.DB
 }
 
 func NewProfileRepository(db *gorm.DB) UserProfileRepository {
 	return &profileRepositoryGorm{
-		crud.NewCRUDRepository[entity.UserProfile](db),
+		crud.NewRepository[entity.UserProfile](db),
 		db,
 	}
 }

@@ -9,8 +9,5 @@ type UserProfile struct {
 	crud.BaseEntity
 	UserID uuid.UUID
 	Name   string
-}
-
-func (up UserProfile) IsAnonymous() bool {
-	return up.UserID == uuid.Nil
+	Avatar string
 }
