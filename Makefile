@@ -1,18 +1,20 @@
-TEST_DIR := ./internal/test
+TEST_DIR := ./internal/test/...
+COVER_PKG := ./internal/...
 
-.PHONY:
-	help
-	grpc
-	grpc-hot
-	lint
-	test
-	test-verbose
-	test-coverage
-	test-coverage-html
-	test-clean
-	build-grpc
-	install-pre-push-hook
-	uninstall-pre-push-hook
+.PHONY: help \
+grpc \
+grpc-hot \
+job \
+lint \
+test \
+test-verbose \
+test-coverage \
+test-coverage-html \
+test-clean \
+build-grpc \
+build-job \
+install-pre-push-hook \
+uninstall-pre-push-hook
 
 help:
 	@echo "Makefile commands:"
@@ -24,13 +26,12 @@ help:
 	@echo "  make test-coverage           - Run all tests with coverage report"
 	@echo "  make test-coverage-html      - Run all tests and generate HTML coverage report"
 	@echo "  make test-clean              - Clean test cache and run tests"
-	@echo "  make build-grpc              - Build the gRPC server binary for Linux"
-	@echo "  make build-job               - Build the job worker binary for Linux"
+	@echo "  make build-grpc              - Build the grpc application binary"
 	@echo "  make install-pre-push-hook   - Install the pre-push git hook"
 	@echo "  make uninstall-pre-push-hook - Uninstall the pre-push git hook"
 
 grpc:
-	go run cmd/grpc/main.go
+	go run ./cmd/grpc
 
 grpc-hot:
 	@echo "🚀 Starting gRPC server with hot reload..."
@@ -42,7 +43,7 @@ lint:
 test:
 	@echo "Running all tests..."
 	@if [ -d $(TEST_DIR) ]; then \
-		go test $(TEST_DIR)/...; \
+		go test $(TEST_DIR); \
 	else \
 		echo "No tests found in $(TEST_DIR), skipping."; \
 	fi
@@ -50,7 +51,7 @@ test:
 test-verbose:
 	@echo "Running all tests with verbose output..."
 	@if [ -d $(TEST_DIR) ]; then \
-		go test -v $(TEST_DIR)/...; \
+		go test -v $(TEST_DIR); \
 	else \
 		echo "No tests found in $(TEST_DIR), skipping."; \
 	fi
@@ -58,7 +59,7 @@ test-verbose:
 test-coverage:
 	@echo "Running all tests with coverage report..."
 	@if [ -d $(TEST_DIR) ]; then \
-		go test -v -cover -coverprofile=coverage.out -coverpkg=./internal/... $(TEST_DIR)/...; \
+		go test -v -cover -coverprofile=coverage.out -coverpkg=$(COVER_PKG) $(TEST_DIR); \
 	else \
 		echo "No tests found in $(TEST_DIR), skipping."; \
 	fi
@@ -66,7 +67,7 @@ test-coverage:
 test-coverage-html:
 	@echo "Running all tests and generating HTML coverage report..."
 	@if [ -d $(TEST_DIR) ]; then \
-		go test -v -cover -coverprofile=coverage.out -coverpkg=./internal/... $(TEST_DIR)/... && \
+		go test -v -cover -coverprofile=coverage.out -coverpkg=$(COVER_PKG) $(TEST_DIR) && \
 		go tool cover -html=coverage.out -o coverage.html && \
 		echo "Coverage report generated: coverage.html"; \
 	else \
@@ -76,14 +77,14 @@ test-coverage-html:
 test-clean:
 	@echo "Cleaning test cache and running tests..."
 	@if [ -d $(TEST_DIR) ]; then \
-		go clean -testcache && go test -v $(TEST_DIR)/...; \
+		go clean -testcache && go test -v $(TEST_DIR); \
 	else \
 		echo "No tests found in $(TEST_DIR), skipping."; \
 	fi
 
 build-grpc:
 	@echo "Building the grpc app..."
-	CGO_ENABLED=0 GOOS=linux go build -trimpath -buildvcs=false -ldflags='-w -s' -o bin/grpc cmd/grpc/main.go
+	CGO_ENABLED=0 GOOS=linux go build -trimpath -buildvcs=false -ldflags='-w -s' -o bin/grpc ./cmd/grpc
 	@echo "Build success! Binary is located at bin/grpc"
 
 install-pre-push-hook:
