@@ -3,7 +3,7 @@ package provider
 import (
 	"github.com/itsLeonB/cocoon/internal/config"
 	"github.com/itsLeonB/cocoon/internal/service"
-	"github.com/itsLeonB/sekure"
+	"github.com/itsLeonB/ezutil/v2"
 )
 
 type Services struct {
@@ -12,22 +12,19 @@ type Services struct {
 	Friendship service.FriendshipService
 }
 
-func ProvideServices(configs config.Auth, repos *Repositories) *Services {
-	hashService := sekure.NewHashService(configs.HashCost)
-
-	jwtService := sekure.NewJwtService(configs.Issuer, configs.SecretKey, configs.TokenDuration)
-
+func ProvideServices(configs config.Config, repos *Repositories, logger ezutil.Logger) *Services {
 	profileService := service.NewProfileService(
 		repos.Transactor,
 		repos.UserProfile,
 	)
 
 	authService := service.NewAuthService(
-		hashService,
-		jwtService,
 		repos.User,
 		repos.Transactor,
 		profileService,
+		repos.OAuthAccount,
+		logger,
+		configs,
 	)
 
 	friendshipService := service.NewFriendshipService(

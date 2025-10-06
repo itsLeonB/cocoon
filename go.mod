@@ -6,7 +6,7 @@ require (
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/google/uuid v1.6.0
 	github.com/itsLeonB/audit v0.1.0
-	github.com/itsLeonB/cocoon-protos v1.2.0
+	github.com/itsLeonB/cocoon-protos v1.3.0-pre2
 	github.com/itsLeonB/ezutil/v2 v2.2.0
 	github.com/itsLeonB/gerpc v0.3.0
 	github.com/itsLeonB/go-crud v1.0.0
@@ -17,6 +17,7 @@ require (
 	github.com/rotisserie/eris v0.5.4
 	github.com/stretchr/testify v1.11.1
 	go.uber.org/mock v0.6.0
+	golang.org/x/oauth2 v0.30.0
 	google.golang.org/grpc v1.75.1
 	google.golang.org/protobuf v1.36.9
 	gorm.io/driver/postgres v1.6.0
@@ -25,6 +26,7 @@ require (
 )
 
 require (
+	cloud.google.com/go/compute/metadata v0.8.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -36,7 +38,7 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/kr/text v0.2.0 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect

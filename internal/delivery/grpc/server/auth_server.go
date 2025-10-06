@@ -7,6 +7,8 @@ import (
 	"github.com/itsLeonB/cocoon-protos/gen/go/auth/v1"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/service"
+	"github.com/itsLeonB/ungerr"
+	"github.com/rotisserie/eris"
 )
 
 type AuthServer struct {
@@ -46,6 +48,41 @@ func (as *AuthServer) Register(ctx context.Context, req *auth.RegisterRequest) (
 }
 
 func (as *AuthServer) Login(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error) {
+	if req == nil {
+		return nil, eris.New("request is nil")
+	}
+	if req.GetInternalRequest() != nil {
+		return as.handleInternalLogin(ctx, req.GetInternalRequest())
+	}
+	if req.GetOauth2Request() != nil {
+		return as.handleOAuth2Login(ctx, req.GetOauth2Request())
+	}
+	return nil, ungerr.BadRequestError("no login method provided")
+}
+
+func (as *AuthServer) handleOAuth2Login(ctx context.Context, req *auth.OAuth2LoginRequest) (*auth.LoginResponse, error) {
+	if req.GetProvider() == "" {
+		return nil, ungerr.BadRequestError("provider is empty")
+	}
+	if req.GetCode() == "" {
+		return nil, ungerr.BadRequestError("code is empty")
+	}
+	if req.GetState() == "" {
+		return nil, ungerr.BadRequestError("state is empty")
+	}
+
+	response, err := as.authService.HandleOAuthCallback(ctx, req.GetProvider(), req.GetCode(), req.GetState())
+	if err != nil {
+		return nil, err
+	}
+
+	return &auth.LoginResponse{
+		Type:  response.Type,
+		Token: response.Token,
+	}, nil
+}
+
+func (as *AuthServer) handleInternalLogin(ctx context.Context, req *auth.InternalLoginRequest) (*auth.LoginResponse, error) {
 	request := dto.LoginRequest{
 		Email:    req.GetEmail(),
 		Password: req.GetPassword(),
@@ -74,5 +111,26 @@ func (as *AuthServer) VerifyToken(ctx context.Context, req *auth.VerifyTokenRequ
 
 	return &auth.VerifyTokenResponse{
 		ProfileId: authData.ProfileID.String(),
+	}, nil
+}
+
+func (as *AuthServer) GetOAuth2Url(ctx context.Context, req *auth.GetOAuth2UrlRequest) (*auth.GetOAuth2UrlResponse, error) {
+	if req == nil {
+		return nil, eris.New("request is nil")
+	}
+	if req.GetProvider() == "" {
+		return nil, ungerr.BadRequestError("provider is empty")
+	}
+	if req.GetState() == "" {
+		return nil, ungerr.BadRequestError("state is empty")
+	}
+
+	url, err := as.authService.GetOAuthURL(ctx, req.GetProvider(), req.GetState())
+	if err != nil {
+		return nil, err
+	}
+
+	return &auth.GetOAuth2UrlResponse{
+		Url: url,
 	}, nil
 }

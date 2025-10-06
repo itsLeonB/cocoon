@@ -4,12 +4,14 @@ import (
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
+	"github.com/rotisserie/eris"
 )
 
 type Config struct {
 	App
 	Auth
 	DB
+	OAuthProviders
 }
 
 type App struct {
@@ -26,19 +28,33 @@ type Auth struct {
 	HashCost      int           `split_words:"true" default:"10"`
 }
 
-func Load() Config {
+func Load() (Config, error) {
+	errMsg := "error loading config"
+
 	var app App
-	envconfig.MustProcess("APP", &app)
+	if err := envconfig.Process("APP", &app); err != nil {
+		return Config{}, eris.Wrap(err, errMsg)
+	}
 
 	var auth Auth
-	envconfig.MustProcess("AUTH", &auth)
+	if err := envconfig.Process("AUTH", &auth); err != nil {
+		return Config{}, eris.Wrap(err, errMsg)
+	}
 
 	var db DB
-	envconfig.MustProcess("DB", &db)
+	if err := envconfig.Process("DB", &db); err != nil {
+		return Config{}, eris.Wrap(err, errMsg)
+	}
+
+	oAuthProviders, err := loadOAuthProviderConfig()
+	if err != nil {
+		return Config{}, eris.Wrap(err, errMsg)
+	}
 
 	return Config{
-		App:  app,
-		Auth: auth,
-		DB:   db,
-	}
+		App:            app,
+		Auth:           auth,
+		DB:             db,
+		OAuthProviders: oAuthProviders,
+	}, nil
 }

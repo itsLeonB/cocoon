@@ -19,7 +19,8 @@ func TestConfig_DefaultValues(t *testing.T) {
 	_ = os.Setenv("DB_USER", "testuser")
 	_ = os.Setenv("DB_PASSWORD", "testpass")
 
-	cfg := config.Load()
+	cfg, err := config.Load()
+	assert.NoError(t, err)
 
 	// Test App defaults
 	assert.Equal(t, "Cocoon", cfg.App.Name)
@@ -61,7 +62,8 @@ func TestConfig_CustomValues(t *testing.T) {
 	_ = os.Setenv("DB_PASSWORD", "custompass")
 	_ = os.Setenv("DB_NAME", "customdb")
 
-	cfg := config.Load()
+	cfg, err := config.Load()
+	assert.NoError(t, err)
 
 	// Test App custom values
 	assert.Equal(t, "CustomApp", cfg.App.Name)

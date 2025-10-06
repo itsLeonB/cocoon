@@ -36,6 +36,7 @@ func (ps *profileServiceImpl) Create(ctx context.Context, request dto.NewProfile
 		newProfile := entity.UserProfile{
 			UserID: request.UserID,
 			Name:   request.Name,
+			Avatar: request.Avatar,
 		}
 
 		insertedProfile, err := ps.profileRepo.Insert(ctx, newProfile)

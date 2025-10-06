@@ -21,3 +21,10 @@ type LoginResponse struct {
 type AuthData struct {
 	ProfileID uuid.UUID
 }
+
+func NewBearerTokenResp(token string) LoginResponse {
+	return LoginResponse{
+		Type:  "Bearer",
+		Token: token,
+	}
+}
