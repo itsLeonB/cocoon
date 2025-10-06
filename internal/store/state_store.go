@@ -57,6 +57,8 @@ func (vss *valkeyStateStore) Store(ctx context.Context, state string, expiry tim
 
 func (vss *valkeyStateStore) VerifyAndDelete(ctx context.Context, state string) (bool, error) {
 	vss.mu.Lock()
+	defer vss.mu.Unlock()
+
 	key := vss.constructKey(state)
 
 	getCmd := vss.client.B().Get().Key(key).Build()
@@ -73,7 +75,6 @@ func (vss *valkeyStateStore) VerifyAndDelete(ctx context.Context, state string) 
 		vss.logger.Error(eris.ToString(err, true))
 	}
 
-	vss.mu.Unlock()
 	return true, nil
 }
 
