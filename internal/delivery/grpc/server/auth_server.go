@@ -51,13 +51,14 @@ func (as *AuthServer) Login(ctx context.Context, req *auth.LoginRequest) (*auth.
 	if req == nil {
 		return nil, eris.New("request is nil")
 	}
-	if req.GetInternalRequest() != nil {
-		return as.handleInternalLogin(ctx, req.GetInternalRequest())
+	switch request := req.GetLoginMethod().(type) {
+	case *auth.LoginRequest_InternalRequest:
+		return as.handleInternalLogin(ctx, request.InternalRequest)
+	case *auth.LoginRequest_Oauth2Request:
+		return as.handleOAuth2Login(ctx, request.Oauth2Request)
+	default:
+		return nil, eris.Errorf("unsupported login method: %T", request)
 	}
-	if req.GetOauth2Request() != nil {
-		return as.handleOAuth2Login(ctx, req.GetOauth2Request())
-	}
-	return nil, ungerr.BadRequestError("no login method provided")
 }
 
 func (as *AuthServer) handleOAuth2Login(ctx context.Context, req *auth.OAuth2LoginRequest) (*auth.LoginResponse, error) {
