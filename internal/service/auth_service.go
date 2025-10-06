@@ -2,7 +2,10 @@ package service
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/itsLeonB/cocoon/internal/appconstant"
@@ -12,6 +15,7 @@ import (
 	"github.com/itsLeonB/cocoon/internal/mapper"
 	"github.com/itsLeonB/cocoon/internal/repository"
 	"github.com/itsLeonB/cocoon/internal/service/oauth"
+	"github.com/itsLeonB/cocoon/internal/store"
 	"github.com/itsLeonB/cocoon/internal/util"
 	"github.com/itsLeonB/ezutil/v2"
 	"github.com/itsLeonB/go-crud"
@@ -28,6 +32,7 @@ type authServiceImpl struct {
 	profileService   ProfileService
 	oauthProviders   map[string]oauth.ProviderService
 	oauthAccountRepo crud.Repository[entity.OAuthAccount]
+	stateStore       store.StateStore
 }
 
 func NewAuthService(
@@ -37,6 +42,7 @@ func NewAuthService(
 	oauthAccountRepo crud.Repository[entity.OAuthAccount],
 	logger ezutil.Logger,
 	configs config.Config,
+	stateStore store.StateStore,
 ) AuthService {
 	return &authServiceImpl{
 		sekure.NewHashService(configs.HashCost),
@@ -46,6 +52,7 @@ func NewAuthService(
 		profileService,
 		oauth.NewOAuthProviderServices(logger, configs.OAuthProviders),
 		oauthAccountRepo,
+		stateStore,
 	}
 }
 
@@ -145,13 +152,27 @@ func (as *authServiceImpl) VerifyToken(ctx context.Context, token string) (dto.A
 	}, nil
 }
 
-func (as *authServiceImpl) GetOAuthURL(ctx context.Context, provider, state string) (string, error) {
+func (as *authServiceImpl) GetOAuthURL(ctx context.Context, provider string) (string, error) {
 	oauthProvider, ok := as.oauthProviders[provider]
 	if !ok {
 		return "", eris.Errorf("unsupported oauth provider: %s", provider)
 	}
 
-	return oauthProvider.GetAuthCodeURL(ctx, state)
+	state, err := as.generateState()
+	if err != nil {
+		return "", err
+	}
+
+	url, err := oauthProvider.GetAuthCodeURL(ctx, state)
+	if err != nil {
+		return "", err
+	}
+
+	if err = as.stateStore.Store(ctx, state, 5*time.Minute); err != nil {
+		return "", err
+	}
+
+	return url, nil
 }
 
 func (as *authServiceImpl) HandleOAuthCallback(ctx context.Context, provider, code, state string) (dto.LoginResponse, error) {
@@ -162,7 +183,15 @@ func (as *authServiceImpl) HandleOAuthCallback(ctx context.Context, provider, co
 			return eris.Errorf("unsupported oauth provider: %s", provider)
 		}
 
-		userInfo, err := oauthProvider.HandleCallback(ctx, code, state)
+		stateIsValid, err := as.stateStore.VerifyAndDelete(ctx, state)
+		if err != nil {
+			return err
+		}
+		if !stateIsValid {
+			return ungerr.BadRequestError("state is not valid")
+		}
+
+		userInfo, err := oauthProvider.HandleCallback(ctx, code)
 		if err != nil {
 			return err
 		}
@@ -253,4 +282,12 @@ func (as *authServiceImpl) findUserByEmail(ctx context.Context, email string) (e
 	userSpec.Model.Email = email
 	userSpec.DeletedFilter = crud.ExcludeDeleted
 	return as.userRepository.FindFirst(ctx, userSpec)
+}
+
+func (as *authServiceImpl) generateState() (string, error) {
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		return "", eris.Wrap(err, "error generating random string")
+	}
+	return base64.URLEncoding.EncodeToString(b), nil
 }

@@ -10,7 +10,7 @@ import (
 type ProviderService interface {
 	IsTrusted() bool
 	GetAuthCodeURL(ctx context.Context, state string) (string, error)
-	HandleCallback(ctx context.Context, code, state string) (UserInfo, error)
+	HandleCallback(ctx context.Context, code string) (UserInfo, error)
 }
 
 func NewOAuthProviderServices(logger ezutil.Logger, cfgs config.OAuthProviders) map[string]ProviderService {

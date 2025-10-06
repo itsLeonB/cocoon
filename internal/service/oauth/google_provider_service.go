@@ -55,7 +55,7 @@ func (gps *googleProviderService) GetAuthCodeURL(ctx context.Context, state stri
 	return url, nil
 }
 
-func (gps *googleProviderService) HandleCallback(ctx context.Context, code, state string) (UserInfo, error) {
+func (gps *googleProviderService) HandleCallback(ctx context.Context, code string) (UserInfo, error) {
 	token, err := gps.cfg.Exchange(ctx, code)
 	if err != nil {
 		return UserInfo{}, eris.Wrap(err, "error exchange OAuth2 token at callback")

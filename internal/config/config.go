@@ -12,6 +12,7 @@ type Config struct {
 	Auth
 	DB
 	OAuthProviders
+	Valkey
 }
 
 type App struct {
@@ -51,10 +52,16 @@ func Load() (Config, error) {
 		return Config{}, eris.Wrap(err, errMsg)
 	}
 
+	var valkey Valkey
+	if err = envconfig.Process("VALKEY", &valkey); err != nil {
+		return Config{}, eris.Wrap(err, errMsg)
+	}
+
 	return Config{
 		App:            app,
 		Auth:           auth,
 		DB:             db,
 		OAuthProviders: oAuthProviders,
+		Valkey:         valkey,
 	}, nil
 }

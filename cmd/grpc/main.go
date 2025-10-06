@@ -14,6 +14,9 @@ func main() {
 	if err != nil {
 		log.Fatal(eris.ToString(err, true))
 	}
-	s := grpc.Setup(configs)
+	s, err := grpc.Setup(configs)
+	if err != nil {
+		log.Fatal(eris.ToString(err, true))
+	}
 	s.Run()
 }

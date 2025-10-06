@@ -121,11 +121,8 @@ func (as *AuthServer) GetOAuth2Url(ctx context.Context, req *auth.GetOAuth2UrlRe
 	if req.GetProvider() == "" {
 		return nil, ungerr.BadRequestError("provider is empty")
 	}
-	if req.GetState() == "" {
-		return nil, ungerr.BadRequestError("state is empty")
-	}
 
-	url, err := as.authService.GetOAuthURL(ctx, req.GetProvider(), req.GetState())
+	url, err := as.authService.GetOAuthURL(ctx, req.GetProvider())
 	if err != nil {
 		return nil, err
 	}

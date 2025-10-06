@@ -11,7 +11,7 @@ type AuthService interface {
 	Register(ctx context.Context, request dto.RegisterRequest) error
 	Login(ctx context.Context, request dto.LoginRequest) (dto.LoginResponse, error)
 	VerifyToken(ctx context.Context, token string) (dto.AuthData, error)
-	GetOAuthURL(ctx context.Context, provider, state string) (string, error)
+	GetOAuthURL(ctx context.Context, provider string) (string, error)
 	HandleOAuthCallback(ctx context.Context, provider, code, state string) (dto.LoginResponse, error)
 }
 

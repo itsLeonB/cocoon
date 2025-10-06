@@ -3,6 +3,7 @@ package provider
 import (
 	"github.com/itsLeonB/cocoon/internal/config"
 	"github.com/itsLeonB/cocoon/internal/service"
+	"github.com/itsLeonB/cocoon/internal/store"
 	"github.com/itsLeonB/ezutil/v2"
 )
 
@@ -12,7 +13,12 @@ type Services struct {
 	Friendship service.FriendshipService
 }
 
-func ProvideServices(configs config.Config, repos *Repositories, logger ezutil.Logger) *Services {
+func ProvideServices(
+	configs config.Config,
+	repos *Repositories,
+	logger ezutil.Logger,
+	store store.StateStore,
+) *Services {
 	profileService := service.NewProfileService(
 		repos.Transactor,
 		repos.UserProfile,
@@ -25,6 +31,7 @@ func ProvideServices(configs config.Config, repos *Repositories, logger ezutil.L
 		repos.OAuthAccount,
 		logger,
 		configs,
+		store,
 	)
 
 	friendshipService := service.NewFriendshipService(

@@ -6,7 +6,7 @@ require (
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/google/uuid v1.6.0
 	github.com/itsLeonB/audit v0.1.0
-	github.com/itsLeonB/cocoon-protos v1.3.0-pre2
+	github.com/itsLeonB/cocoon-protos v1.3.0-pre3
 	github.com/itsLeonB/ezutil/v2 v2.2.0
 	github.com/itsLeonB/gerpc v0.3.0
 	github.com/itsLeonB/go-crud v1.0.0
@@ -16,6 +16,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/rotisserie/eris v0.5.4
 	github.com/stretchr/testify v1.11.1
+	github.com/valkey-io/valkey-go v1.0.66
 	go.uber.org/mock v0.6.0
 	golang.org/x/oauth2 v0.30.0
 	google.golang.org/grpc v1.75.1
