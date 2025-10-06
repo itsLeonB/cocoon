@@ -19,6 +19,7 @@ type ProfileResponse struct {
 type NewProfileRequest struct {
 	UserID uuid.UUID
 	Name   string `validate:"required,min=1,max=255"`
+	Avatar string
 }
 
 type UpdateProfileRequest struct {

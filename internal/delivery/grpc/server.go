@@ -8,8 +8,12 @@ import (
 	"google.golang.org/grpc"
 )
 
-func Setup(configs config.Config) *gerpc.GrpcServer {
-	providers := provider.All(configs)
+func Setup(configs config.Config) (*gerpc.GrpcServer, error) {
+	logger := provider.ProvideLogger(config.AppName, configs.Env)
+	providers, err := provider.All(logger, configs)
+	if err != nil {
+		return nil, err
+	}
 	servers := server.ProvideServers(providers.Services)
 
 	// Middlewares/Interceptors
@@ -25,5 +29,5 @@ func Setup(configs config.Config) *gerpc.GrpcServer {
 		WithAddress(":" + configs.App.Port).
 		WithOpts(opts...).
 		WithRegisterSrvFunc(servers.Register).
-		WithShutdownFunc(providers.Shutdown)
+		WithShutdownFunc(providers.Shutdown), nil
 }

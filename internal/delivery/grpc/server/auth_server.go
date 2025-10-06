@@ -5,8 +5,11 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/itsLeonB/cocoon-protos/gen/go/auth/v1"
+	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/service"
+	"github.com/itsLeonB/ungerr"
+	"github.com/rotisserie/eris"
 )
 
 type AuthServer struct {
@@ -46,6 +49,41 @@ func (as *AuthServer) Register(ctx context.Context, req *auth.RegisterRequest) (
 }
 
 func (as *AuthServer) Login(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error) {
+	if req == nil {
+		return nil, eris.New("request is nil")
+	}
+	switch request := req.GetLoginMethod().(type) {
+	case *auth.LoginRequest_InternalRequest:
+		return as.handleInternalLogin(ctx, request.InternalRequest)
+	case *auth.LoginRequest_Oauth2Request:
+		return as.handleOAuth2Login(ctx, request.Oauth2Request)
+	default:
+		return nil, eris.Errorf("unsupported login method: %T", request)
+	}
+}
+
+func (as *AuthServer) handleOAuth2Login(ctx context.Context, req *auth.OAuth2LoginRequest) (*auth.LoginResponse, error) {
+	data := dto.OAuthCallbackData{
+		Provider: req.GetProvider(),
+		Code:     req.GetCode(),
+		State:    req.GetState(),
+	}
+	if err := as.validate.Struct(data); err != nil {
+		return nil, eris.Wrap(err, appconstant.ErrStructValidation)
+	}
+
+	response, err := as.authService.HandleOAuthCallback(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+
+	return &auth.LoginResponse{
+		Type:  response.Type,
+		Token: response.Token,
+	}, nil
+}
+
+func (as *AuthServer) handleInternalLogin(ctx context.Context, req *auth.InternalLoginRequest) (*auth.LoginResponse, error) {
 	request := dto.LoginRequest{
 		Email:    req.GetEmail(),
 		Password: req.GetPassword(),
@@ -74,5 +112,23 @@ func (as *AuthServer) VerifyToken(ctx context.Context, req *auth.VerifyTokenRequ
 
 	return &auth.VerifyTokenResponse{
 		ProfileId: authData.ProfileID.String(),
+	}, nil
+}
+
+func (as *AuthServer) GetOAuth2Url(ctx context.Context, req *auth.GetOAuth2UrlRequest) (*auth.GetOAuth2UrlResponse, error) {
+	if req == nil {
+		return nil, eris.New("request is nil")
+	}
+	if req.GetProvider() == "" {
+		return nil, ungerr.BadRequestError("provider is empty")
+	}
+
+	url, err := as.authService.GetOAuthURL(ctx, req.GetProvider())
+	if err != nil {
+		return nil, err
+	}
+
+	return &auth.GetOAuth2UrlResponse{
+		Url: url,
 	}, nil
 }

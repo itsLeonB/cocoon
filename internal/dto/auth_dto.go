@@ -21,3 +21,16 @@ type LoginResponse struct {
 type AuthData struct {
 	ProfileID uuid.UUID
 }
+
+func NewBearerTokenResp(token string) LoginResponse {
+	return LoginResponse{
+		Type:  "Bearer",
+		Token: token,
+	}
+}
+
+type OAuthCallbackData struct {
+	Provider string `validate:"required,min=1"`
+	Code     string `validate:"required,min=1"`
+	State    string `validate:"required,min=1"`
+}

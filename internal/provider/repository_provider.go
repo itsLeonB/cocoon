@@ -8,17 +8,19 @@ import (
 )
 
 type Repositories struct {
-	Transactor  crud.Transactor
-	User        repository.UserRepository
-	UserProfile repository.UserProfileRepository
-	Friendship  repository.FriendshipRepository
+	Transactor   crud.Transactor
+	User         repository.UserRepository
+	UserProfile  repository.UserProfileRepository
+	Friendship   repository.FriendshipRepository
+	OAuthAccount crud.Repository[entity.OAuthAccount]
 }
 
 func ProvideRepositories(db *gorm.DB) *Repositories {
 	return &Repositories{
-		Transactor:  crud.NewTransactor(db),
-		User:        crud.NewRepository[entity.User](db),
-		UserProfile: repository.NewProfileRepository(db),
-		Friendship:  repository.NewFriendshipRepository(db),
+		Transactor:   crud.NewTransactor(db),
+		User:         crud.NewRepository[entity.User](db),
+		UserProfile:  repository.NewProfileRepository(db),
+		Friendship:   repository.NewFriendshipRepository(db),
+		OAuthAccount: crud.NewRepository[entity.OAuthAccount](db),
 	}
 }
