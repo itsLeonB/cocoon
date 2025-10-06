@@ -28,3 +28,9 @@ func NewBearerTokenResp(token string) LoginResponse {
 		Token: token,
 	}
 }
+
+type OAuthCallbackData struct {
+	Provider string `validate:"required,min=1"`
+	Code     string `validate:"required,min=1"`
+	State    string `validate:"required,min=1"`
+}

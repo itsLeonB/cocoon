@@ -7,6 +7,8 @@ import (
 	"github.com/rotisserie/eris"
 )
 
+const AppName = "Cocoon"
+
 type Config struct {
 	App
 	Auth
@@ -16,7 +18,6 @@ type Config struct {
 }
 
 type App struct {
-	Name    string        `default:"Cocoon"`
 	Env     string        `default:"debug"`
 	Port    string        `default:"50051"`
 	Timeout time.Duration `default:"10s"`

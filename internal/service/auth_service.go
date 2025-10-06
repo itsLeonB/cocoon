@@ -175,15 +175,15 @@ func (as *authServiceImpl) GetOAuthURL(ctx context.Context, provider string) (st
 	return url, nil
 }
 
-func (as *authServiceImpl) HandleOAuthCallback(ctx context.Context, provider, code, state string) (dto.LoginResponse, error) {
+func (as *authServiceImpl) HandleOAuthCallback(ctx context.Context, data dto.OAuthCallbackData) (dto.LoginResponse, error) {
 	var response dto.LoginResponse
 	err := as.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
-		oauthProvider, ok := as.oauthProviders[provider]
+		oauthProvider, ok := as.oauthProviders[data.Provider]
 		if !ok {
-			return eris.Errorf("unsupported oauth provider: %s", provider)
+			return eris.Errorf("unsupported oauth provider: %s", data.Provider)
 		}
 
-		stateIsValid, err := as.stateStore.VerifyAndDelete(ctx, state)
+		stateIsValid, err := as.stateStore.VerifyAndDelete(ctx, data.State)
 		if err != nil {
 			return err
 		}
@@ -191,7 +191,7 @@ func (as *authServiceImpl) HandleOAuthCallback(ctx context.Context, provider, co
 			return ungerr.BadRequestError("state is not valid")
 		}
 
-		userInfo, err := oauthProvider.HandleCallback(ctx, code)
+		userInfo, err := oauthProvider.HandleCallback(ctx, data.Code)
 		if err != nil {
 			return err
 		}
@@ -201,6 +201,9 @@ func (as *authServiceImpl) HandleOAuthCallback(ctx context.Context, provider, co
 			return err
 		}
 		if !existingOAuth.IsZero() && !existingOAuth.IsDeleted() {
+			if existingOAuth.User.IsDeleted() {
+				return ungerr.NotFoundError(appconstant.ErrAuthUnknownCredentials)
+			}
 			response, err = as.createLoginResponse(existingOAuth.User)
 			return err
 		}
@@ -236,6 +239,8 @@ func (as *authServiceImpl) createNewUserOAuth(ctx context.Context, userInfo oaut
 		if _, err = as.profileService.Create(ctx, newProfile); err != nil {
 			return entity.User{}, err
 		}
+	} else if user.IsDeleted() {
+		return entity.User{}, ungerr.NotFoundError(appconstant.ErrAuthUnknownCredentials)
 	}
 
 	if !as.oauthProviders[userInfo.Provider].IsTrusted() {

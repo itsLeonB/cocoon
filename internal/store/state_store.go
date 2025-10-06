@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/itsLeonB/cocoon/internal/config"
@@ -21,6 +22,7 @@ type StateStore interface {
 type valkeyStateStore struct {
 	logger ezutil.Logger
 	client valkey.Client
+	mu     sync.Mutex
 }
 
 func NewStateStore(logger ezutil.Logger, cfg config.Valkey) (StateStore, error) {
@@ -36,8 +38,9 @@ func NewStateStore(logger ezutil.Logger, cfg config.Valkey) (StateStore, error) 
 		return nil, eris.Wrap(err, "error initializing valkey client")
 	}
 	return &valkeyStateStore{
-		logger,
-		client,
+		logger: logger,
+		client: client,
+		mu:     sync.Mutex{},
 	}, nil
 }
 
@@ -53,6 +56,7 @@ func (vss *valkeyStateStore) Store(ctx context.Context, state string, expiry tim
 }
 
 func (vss *valkeyStateStore) VerifyAndDelete(ctx context.Context, state string) (bool, error) {
+	vss.mu.Lock()
 	key := vss.constructKey(state)
 
 	getCmd := vss.client.B().Get().Key(key).Build()
@@ -69,6 +73,7 @@ func (vss *valkeyStateStore) VerifyAndDelete(ctx context.Context, state string) 
 		vss.logger.Error(eris.ToString(err, true))
 	}
 
+	vss.mu.Unlock()
 	return true, nil
 }
 

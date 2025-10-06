@@ -12,7 +12,7 @@ type AuthService interface {
 	Login(ctx context.Context, request dto.LoginRequest) (dto.LoginResponse, error)
 	VerifyToken(ctx context.Context, token string) (dto.AuthData, error)
 	GetOAuthURL(ctx context.Context, provider string) (string, error)
-	HandleOAuthCallback(ctx context.Context, provider, code, state string) (dto.LoginResponse, error)
+	HandleOAuthCallback(ctx context.Context, data dto.OAuthCallbackData) (dto.LoginResponse, error)
 }
 
 type ProfileService interface {

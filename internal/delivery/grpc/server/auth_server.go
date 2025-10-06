@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/itsLeonB/cocoon-protos/gen/go/auth/v1"
+	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/service"
 	"github.com/itsLeonB/ungerr"
@@ -62,17 +63,16 @@ func (as *AuthServer) Login(ctx context.Context, req *auth.LoginRequest) (*auth.
 }
 
 func (as *AuthServer) handleOAuth2Login(ctx context.Context, req *auth.OAuth2LoginRequest) (*auth.LoginResponse, error) {
-	if req.GetProvider() == "" {
-		return nil, ungerr.BadRequestError("provider is empty")
+	data := dto.OAuthCallbackData{
+		Provider: req.GetProvider(),
+		Code:     req.GetCode(),
+		State:    req.GetState(),
 	}
-	if req.GetCode() == "" {
-		return nil, ungerr.BadRequestError("code is empty")
-	}
-	if req.GetState() == "" {
-		return nil, ungerr.BadRequestError("state is empty")
+	if err := as.validate.Struct(data); err != nil {
+		return nil, eris.Wrap(err, appconstant.ErrStructValidation)
 	}
 
-	response, err := as.authService.HandleOAuthCallback(ctx, req.GetProvider(), req.GetCode(), req.GetState())
+	response, err := as.authService.HandleOAuthCallback(ctx, data)
 	if err != nil {
 		return nil, err
 	}

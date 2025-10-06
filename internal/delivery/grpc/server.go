@@ -9,7 +9,7 @@ import (
 )
 
 func Setup(configs config.Config) (*gerpc.GrpcServer, error) {
-	logger := provider.ProvideLogger("Cocoon", configs.Env)
+	logger := provider.ProvideLogger(config.AppName, configs.Env)
 	providers, err := provider.All(logger, configs)
 	if err != nil {
 		return nil, err
