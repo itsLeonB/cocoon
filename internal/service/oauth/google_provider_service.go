@@ -32,7 +32,7 @@ func newGoogleProviderService(logger ezutil.Logger, cfg config.OAuthProvider) Pr
 		cfg: &oauth2.Config{
 			ClientID:     cfg.ClientID,
 			ClientSecret: cfg.ClientSecret,
-			RedirectURL:  cfg.RedirectURL,
+			RedirectURL:  cfg.RedirectUrl,
 			Endpoint:     google.Endpoint,
 			Scopes: []string{
 				"https://www.googleapis.com/auth/userinfo.email",

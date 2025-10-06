@@ -9,7 +9,7 @@ type OAuthProviders struct {
 type OAuthProvider struct {
 	ClientID     string `split_words:"true" required:"true"`
 	ClientSecret string `split_words:"true" required:"true"`
-	RedirectURL  string `split_words:"true" required:"true"`
+	RedirectUrl  string `split_words:"true" required:"true"`
 }
 
 func loadOAuthProviderConfig() (OAuthProviders, error) {
