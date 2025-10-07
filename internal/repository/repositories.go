@@ -5,12 +5,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/itsLeonB/cocoon/internal/entity"
-	crud "github.com/itsLeonB/go-crud"
+	"github.com/itsLeonB/go-crud"
 )
-
-type UserRepository interface {
-	crud.Repository[entity.User]
-}
 
 type UserProfileRepository interface {
 	crud.Repository[entity.UserProfile]

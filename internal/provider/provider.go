@@ -22,6 +22,20 @@ func All(logger ezutil.Logger, configs config.Config) (*Provider, error) {
 
 	store, err := store.NewStateStore(logger, configs.Valkey)
 	if err != nil {
+		if e := dbs.Shutdown(); e != nil {
+			logger.Errorf("error cleaning up DB resources: %v", e)
+		}
+		return nil, err
+	}
+
+	services, err := ProvideServices(configs, repos, logger, store)
+	if err != nil {
+		if e := dbs.Shutdown(); e != nil {
+			logger.Errorf("error cleaning up DB resources: %v", e)
+		}
+		if e := store.Shutdown(); e != nil {
+			logger.Errorf("error cleaning up store resources: %v", e)
+		}
 		return nil, err
 	}
 
@@ -29,7 +43,7 @@ func All(logger ezutil.Logger, configs config.Config) (*Provider, error) {
 		Logger:       logger,
 		DBs:          dbs,
 		Repositories: repos,
-		Services:     ProvideServices(configs, repos, logger, store),
+		Services:     services,
 		Store:        store,
 	}, nil
 }

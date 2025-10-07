@@ -6,6 +6,7 @@ type RegisterRequest struct {
 	Email                string `validate:"required,email,min=3"`
 	Password             string `validate:"required,eqfield=PasswordConfirmation"`
 	PasswordConfirmation string `validate:"required"`
+	VerificationURL      string
 }
 
 type LoginRequest struct {

@@ -3,10 +3,11 @@ module github.com/itsLeonB/cocoon
 go 1.25.0
 
 require (
+	github.com/getbrevo/brevo-go v1.1.3
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/google/uuid v1.6.0
 	github.com/itsLeonB/audit v0.1.0
-	github.com/itsLeonB/cocoon-protos v1.3.0
+	github.com/itsLeonB/cocoon-protos v1.4.0
 	github.com/itsLeonB/ezutil/v2 v2.2.0
 	github.com/itsLeonB/gerpc v0.3.0
 	github.com/itsLeonB/go-crud v1.0.0
@@ -28,6 +29,7 @@ require (
 
 require (
 	cloud.google.com/go/compute/metadata v0.8.0 // indirect
+	github.com/antihax/optional v1.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

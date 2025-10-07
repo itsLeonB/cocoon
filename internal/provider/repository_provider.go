@@ -3,13 +3,13 @@ package provider
 import (
 	"github.com/itsLeonB/cocoon/internal/entity"
 	"github.com/itsLeonB/cocoon/internal/repository"
-	crud "github.com/itsLeonB/go-crud"
+	"github.com/itsLeonB/go-crud"
 	"gorm.io/gorm"
 )
 
 type Repositories struct {
 	Transactor   crud.Transactor
-	User         repository.UserRepository
+	User         crud.Repository[entity.User]
 	UserProfile  repository.UserProfileRepository
 	Friendship   repository.FriendshipRepository
 	OAuthAccount crud.Repository[entity.OAuthAccount]

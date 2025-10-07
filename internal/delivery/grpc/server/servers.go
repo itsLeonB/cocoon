@@ -20,7 +20,7 @@ func ProvideServers(services *provider.Services) *Servers {
 	validate := validator.New()
 
 	return &Servers{
-		Auth:       NewAuthServer(validate, services.Auth),
+		Auth:       NewAuthServer(validate, services.Auth, services.OAuth),
 		Profile:    NewProfileServer(validate, services.Profile),
 		Friendship: NewFriendshipServer(validate, services.Friendship),
 	}

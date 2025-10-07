@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/itsLeonB/audit/gen/go/audit/v1"
 	"github.com/itsLeonB/cocoon-protos/gen/go/profile/v1"
+	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/ezutil/v2"
 	"github.com/itsLeonB/gerpc"
@@ -29,7 +30,7 @@ func ToProfileResponseProto(res dto.ProfileResponse) *profile.ProfileResponse {
 
 func FromUpdateProfileRequestProto(req *profile.UpdateRequest) (dto.UpdateProfileRequest, error) {
 	if req == nil {
-		return dto.UpdateProfileRequest{}, eris.New("request is nil")
+		return dto.UpdateProfileRequest{}, eris.New(appconstant.ErrNilRequest)
 	}
 	if req.GetId() == "" {
 		return dto.UpdateProfileRequest{}, eris.New("id is nil")

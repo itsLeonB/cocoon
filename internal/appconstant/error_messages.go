@@ -15,4 +15,6 @@ const (
 	ErrFriendshipDeleted  = "friendship is deleted"
 
 	ErrStructValidation = "error validating struct"
+
+	ErrNilRequest = "request is nil"
 )
