@@ -107,7 +107,7 @@ func (as *oauthServiceImpl) getOrCreateUser(ctx context.Context, userInfo oauth.
 		if existingOAuth.User.IsDeleted() {
 			return entity.User{}, ungerr.NotFoundError(appconstant.ErrAuthUnknownCredentials)
 		}
-		return entity.User{}, err
+		return existingOAuth.User, err
 	}
 	return as.createNewUserOAuth(ctx, userInfo)
 }
@@ -120,9 +120,10 @@ func (as *oauthServiceImpl) createNewUserOAuth(ctx context.Context, userInfo oau
 	if user.IsZero() {
 		// New user
 		newUser := dto.NewUserRequest{
-			Email:  user.Email,
-			Name:   userInfo.Name,
-			Avatar: userInfo.Avatar,
+			Email:     userInfo.Email,
+			Name:      userInfo.Name,
+			Avatar:    userInfo.Avatar,
+			VerifyNow: true,
 		}
 		user, err = as.userSvc.CreateNew(ctx, newUser)
 		if err != nil {

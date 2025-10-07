@@ -9,10 +9,6 @@ import (
 	"github.com/rotisserie/eris"
 )
 
-type MailService interface {
-	Send(ctx context.Context, msg dto.MailMessage) error
-}
-
 type brevoMailService struct {
 	client     *brevo.APIClient
 	senderMail string

@@ -40,3 +40,7 @@ type FriendshipService interface {
 	GetDetails(ctx context.Context, profileID, friendshipID uuid.UUID) (dto.FriendDetails, error)
 	IsFriends(ctx context.Context, profileID1, profileID2 uuid.UUID) (bool, bool, error)
 }
+
+type MailService interface {
+	Send(ctx context.Context, msg dto.MailMessage) error
+}

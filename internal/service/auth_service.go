@@ -97,6 +97,13 @@ func (as *authServiceImpl) VerifyRegistration(ctx context.Context, token string)
 		if !ok {
 			return eris.New("error asserting email, is not a string")
 		}
+		unixTime, ok := claims.Data["exp"].(int64)
+		if !ok {
+			return eris.New("error asserting exp, is not an int64")
+		}
+		if time.Now().Unix() > unixTime {
+			return ungerr.UnauthorizedError("token has expired")
+		}
 
 		user, err := as.userSvc.Verify(ctx, userID, email)
 		if err != nil {
@@ -176,7 +183,7 @@ func (as *authServiceImpl) sendVerificationMail(ctx context.Context, user entity
 	claims := map[string]any{
 		"id":    user.ID,
 		"email": user.Email,
-		"exp":   time.Now().Add(30 * time.Minute),
+		"exp":   time.Now().Add(30 * time.Minute).Unix(),
 	}
 
 	token, err := as.jwtService.CreateToken(claims)
