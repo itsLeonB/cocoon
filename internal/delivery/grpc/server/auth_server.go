@@ -16,15 +16,18 @@ type AuthServer struct {
 	auth.UnimplementedAuthServiceServer
 	validate    *validator.Validate
 	authService service.AuthService
+	oAuthSvc    service.OAuthService
 }
 
 func NewAuthServer(
 	validate *validator.Validate,
 	authService service.AuthService,
+	oAuthSvc service.OAuthService,
 ) auth.AuthServiceServer {
 	return &AuthServer{
 		validate:    validate,
 		authService: authService,
+		oAuthSvc:    oAuthSvc,
 	}
 }
 
@@ -33,24 +36,26 @@ func (as *AuthServer) Register(ctx context.Context, req *auth.RegisterRequest) (
 		Email:                req.GetEmail(),
 		Password:             req.GetPassword(),
 		PasswordConfirmation: req.GetPasswordConfirmation(),
+		VerificationURL:      req.GetVerificationUrl(),
 	}
 
 	if err := as.validate.Struct(request); err != nil {
 		return nil, err
 	}
 
-	if err := as.authService.Register(ctx, request); err != nil {
+	isVerified, err := as.authService.Register(ctx, request)
+	if err != nil {
 		return nil, err
 	}
 
 	return &auth.RegisterResponse{
-		Message: "success",
+		IsVerified: isVerified,
 	}, nil
 }
 
 func (as *AuthServer) Login(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error) {
 	if req == nil {
-		return nil, eris.New("request is nil")
+		return nil, eris.New(appconstant.ErrNilRequest)
 	}
 	switch request := req.GetLoginMethod().(type) {
 	case *auth.LoginRequest_InternalRequest:
@@ -72,7 +77,7 @@ func (as *AuthServer) handleOAuth2Login(ctx context.Context, req *auth.OAuth2Log
 		return nil, eris.Wrap(err, appconstant.ErrStructValidation)
 	}
 
-	response, err := as.authService.HandleOAuthCallback(ctx, data)
+	response, err := as.oAuthSvc.HandleOAuthCallback(ctx, data)
 	if err != nil {
 		return nil, err
 	}
@@ -117,18 +122,37 @@ func (as *AuthServer) VerifyToken(ctx context.Context, req *auth.VerifyTokenRequ
 
 func (as *AuthServer) GetOAuth2Url(ctx context.Context, req *auth.GetOAuth2UrlRequest) (*auth.GetOAuth2UrlResponse, error) {
 	if req == nil {
-		return nil, eris.New("request is nil")
+		return nil, eris.New(appconstant.ErrNilRequest)
 	}
 	if req.GetProvider() == "" {
 		return nil, ungerr.BadRequestError("provider is empty")
 	}
 
-	url, err := as.authService.GetOAuthURL(ctx, req.GetProvider())
+	url, err := as.oAuthSvc.GetOAuthURL(ctx, req.GetProvider())
 	if err != nil {
 		return nil, err
 	}
 
 	return &auth.GetOAuth2UrlResponse{
 		Url: url,
+	}, nil
+}
+
+func (as *AuthServer) VerifyRegistration(ctx context.Context, req *auth.VerifyRegistrationRequest) (*auth.LoginResponse, error) {
+	if req == nil {
+		return nil, eris.New(appconstant.ErrNilRequest)
+	}
+	if req.GetToken() == "" {
+		return nil, ungerr.BadRequestError("token is empty")
+	}
+
+	response, err := as.authService.VerifyRegistration(ctx, req.GetToken())
+	if err != nil {
+		return nil, err
+	}
+
+	return &auth.LoginResponse{
+		Type:  response.Type,
+		Token: response.Token,
 	}, nil
 }

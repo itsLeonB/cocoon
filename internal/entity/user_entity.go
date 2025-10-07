@@ -1,10 +1,19 @@
 package entity
 
-import "github.com/itsLeonB/go-crud"
+import (
+	"database/sql"
+
+	"github.com/itsLeonB/go-crud"
+)
 
 type User struct {
 	crud.BaseEntity
-	Email    string
-	Password string
-	Profile  UserProfile
+	Email      string
+	Password   string
+	Profile    UserProfile
+	VerifiedAt sql.NullTime
+}
+
+func (u User) IsVerified() bool {
+	return u.VerifiedAt.Valid && !u.VerifiedAt.Time.IsZero()
 }

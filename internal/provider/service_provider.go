@@ -9,6 +9,7 @@ import (
 
 type Services struct {
 	Auth       service.AuthService
+	OAuth      service.OAuthService
 	Profile    service.ProfileService
 	Friendship service.FriendshipService
 }
@@ -18,20 +19,35 @@ func ProvideServices(
 	repos *Repositories,
 	logger ezutil.Logger,
 	store store.StateStore,
-) *Services {
+) (*Services, error) {
 	profileService := service.NewProfileService(
 		repos.Transactor,
 		repos.UserProfile,
 	)
 
-	authService := service.NewAuthService(
-		repos.User,
+	userSvc := service.NewUserService(
 		repos.Transactor,
+		repos.User,
 		profileService,
+	)
+
+	mailSvc := service.NewMailService(configs.Mail)
+
+	authService := service.NewAuthService(
+		repos.Transactor,
+		configs.Auth,
+		userSvc,
+		mailSvc,
+		logger,
+	)
+
+	oAuthSvc := service.NewOAuthService(
+		repos.Transactor,
 		repos.OAuthAccount,
 		logger,
 		configs,
 		store,
+		userSvc,
 	)
 
 	friendshipService := service.NewFriendshipService(
@@ -42,7 +58,8 @@ func ProvideServices(
 
 	return &Services{
 		Auth:       authService,
+		OAuth:      oAuthSvc,
 		Profile:    profileService,
 		Friendship: friendshipService,
-	}
+	}, nil
 }

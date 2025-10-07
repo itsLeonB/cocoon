@@ -1,12 +1,13 @@
 package provider
 
 import (
+	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/ezutil/v2"
 )
 
-func ProvideLogger(appName, env string) ezutil.Logger {
+func ProvideLogger(appName string, env appconstant.Environment) ezutil.Logger {
 	minLevel := 0
-	if env == "release" {
+	if env == appconstant.EnvProd {
 		minLevel = 1
 	}
 

@@ -3,6 +3,7 @@ package config
 import (
 	"time"
 
+	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/rotisserie/eris"
 )
@@ -15,12 +16,13 @@ type Config struct {
 	DB
 	OAuthProviders
 	Valkey
+	Mail
 }
 
 type App struct {
-	Env     string        `default:"debug"`
-	Port    string        `default:"50051"`
-	Timeout time.Duration `default:"10s"`
+	Env     appconstant.Environment `default:"dev"`
+	Port    string                  `default:"50051"`
+	Timeout time.Duration           `default:"10s"`
 }
 
 type Auth struct {
@@ -58,11 +60,17 @@ func Load() (Config, error) {
 		return Config{}, eris.Wrap(err, errMsg)
 	}
 
+	var mail Mail
+	if err = envconfig.Process("MAIL", &mail); err != nil {
+		return Config{}, eris.Wrap(err, errMsg)
+	}
+
 	return Config{
 		App:            app,
 		Auth:           auth,
 		DB:             db,
 		OAuthProviders: oAuthProviders,
 		Valkey:         valkey,
+		Mail:           mail,
 	}, nil
 }

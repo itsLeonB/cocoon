@@ -5,14 +5,26 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/itsLeonB/cocoon/internal/dto"
+	"github.com/itsLeonB/cocoon/internal/entity"
 )
 
 type AuthService interface {
-	Register(ctx context.Context, request dto.RegisterRequest) error
+	Register(ctx context.Context, request dto.RegisterRequest) (bool, error)
 	Login(ctx context.Context, request dto.LoginRequest) (dto.LoginResponse, error)
 	VerifyToken(ctx context.Context, token string) (dto.AuthData, error)
+	VerifyRegistration(ctx context.Context, token string) (dto.LoginResponse, error)
+}
+
+type OAuthService interface {
 	GetOAuthURL(ctx context.Context, provider string) (string, error)
 	HandleOAuthCallback(ctx context.Context, data dto.OAuthCallbackData) (dto.LoginResponse, error)
+}
+
+type UserService interface {
+	CreateNew(ctx context.Context, request dto.NewUserRequest) (entity.User, error)
+	GetByID(ctx context.Context, id uuid.UUID) (dto.UserResponse, error)
+	FindByEmail(ctx context.Context, email string) (entity.User, error)
+	Verify(ctx context.Context, id uuid.UUID, email string) (entity.User, error)
 }
 
 type ProfileService interface {

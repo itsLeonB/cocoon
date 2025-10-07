@@ -9,13 +9,14 @@ import (
 
 	"github.com/itsLeonB/cocoon/internal/config"
 	"github.com/itsLeonB/ezutil/v2"
+	"github.com/itsLeonB/ungerr"
 	"github.com/rotisserie/eris"
 	"github.com/valkey-io/valkey-go"
 )
 
 type StateStore interface {
 	Store(ctx context.Context, state string, expiry time.Duration) error
-	VerifyAndDelete(ctx context.Context, state string) (bool, error)
+	VerifyAndDelete(ctx context.Context, state string) error
 	Shutdown() error
 }
 
@@ -55,7 +56,7 @@ func (vss *valkeyStateStore) Store(ctx context.Context, state string, expiry tim
 	return nil
 }
 
-func (vss *valkeyStateStore) VerifyAndDelete(ctx context.Context, state string) (bool, error) {
+func (vss *valkeyStateStore) VerifyAndDelete(ctx context.Context, state string) error {
 	vss.mu.Lock()
 	defer vss.mu.Unlock()
 
@@ -64,9 +65,9 @@ func (vss *valkeyStateStore) VerifyAndDelete(ctx context.Context, state string) 
 	getCmd := vss.client.B().Get().Key(key).Build()
 	if err := vss.client.Do(ctx, getCmd).Error(); err != nil {
 		if valkey.IsValkeyNil(err) {
-			return false, nil
+			return ungerr.BadRequestError("invalid state")
 		}
-		return false, eris.Wrap(err, "failed to get state in valkey")
+		return eris.Wrap(err, "failed to get state in valkey")
 	}
 
 	delCmd := vss.client.B().Del().Key(key).Build()
@@ -75,7 +76,7 @@ func (vss *valkeyStateStore) VerifyAndDelete(ctx context.Context, state string) 
 		vss.logger.Error(eris.ToString(err, true))
 	}
 
-	return true, nil
+	return nil
 }
 
 func (vss *valkeyStateStore) Shutdown() error {
