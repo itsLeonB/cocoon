@@ -1,8 +1,9 @@
 package dto
 
 type MailMessage struct {
-	Recipient string `validate:"required,min=3,email"`
-	Subject   string `validate:"required,min=3"`
-	BodyType  string `validate:"required,min=3,oneof=text/plain"`
-	Body      string `validate:"required,min=3"`
+	RecipientMail string `validate:"required,min=3,email"`
+	RecipientName string `validate:"required,min=1"`
+	Subject       string `validate:"required,min=3"`
+	HTMLContent   string
+	TextContent   string
 }

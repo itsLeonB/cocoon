@@ -38,7 +38,6 @@ func ProvideServices(
 		configs.Auth,
 		userSvc,
 		mailSvc,
-		logger,
 	)
 
 	oAuthSvc := service.NewOAuthService(

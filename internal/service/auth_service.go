@@ -25,7 +25,6 @@ type authServiceImpl struct {
 	transactor  crud.Transactor
 	userSvc     UserService
 	mailSvc     MailService
-	logger      ezutil.Logger
 }
 
 func NewAuthService(
@@ -33,7 +32,6 @@ func NewAuthService(
 	configs config.Auth,
 	userSvc UserService,
 	mailSvc MailService,
-	logger ezutil.Logger,
 ) AuthService {
 	return &authServiceImpl{
 		sekure.NewHashService(configs.HashCost),
@@ -41,7 +39,6 @@ func NewAuthService(
 		transactor,
 		userSvc,
 		mailSvc,
-		logger,
 	}
 }
 
@@ -76,8 +73,7 @@ func (as *authServiceImpl) Register(ctx context.Context, request dto.RegisterReq
 			return nil
 		}
 
-		go as.sendVerificationMail(user.ID, user.Email, request.VerificationURL)
-		return nil
+		return as.sendVerificationMail(ctx, user, request.VerificationURL)
 	})
 	return isVerified, err
 }
@@ -176,32 +172,26 @@ func (as *authServiceImpl) createLoginResponse(user entity.User) (dto.LoginRespo
 	return dto.NewBearerTokenResp(token), nil
 }
 
-func (as *authServiceImpl) sendVerificationMail(
-	userID uuid.UUID,
-	email string,
-	verificationURL string,
-) {
+func (as *authServiceImpl) sendVerificationMail(ctx context.Context, user entity.User, verificationURL string) error {
 	claims := map[string]any{
-		"id":    userID,
-		"email": email,
+		"id":    user.ID,
+		"email": user.Email,
 		"exp":   time.Now().Add(30 * time.Minute),
 	}
 
 	token, err := as.jwtService.CreateToken(claims)
 	if err != nil {
-		as.logger.Error(eris.ToString(err, true))
+		return err
 	}
 
 	url := fmt.Sprintf("%s?token=%s", verificationURL, token)
 
 	mailMsg := dto.MailMessage{
-		Recipient: email,
-		Subject:   "Verify your email",
-		BodyType:  "text/plain",
-		Body:      "Please verify your email by clicking the following link:\n\n" + url,
+		RecipientMail: user.Email,
+		RecipientName: util.GetNameFromEmail(user.Email),
+		Subject:       "Verify your email",
+		TextContent:   "Please verify your email by clicking the following link:\n\n" + url,
 	}
 
-	if err = as.mailSvc.Send(mailMsg); err != nil {
-		as.logger.Error(eris.ToString(err, true))
-	}
+	return as.mailSvc.Send(ctx, mailMsg)
 }

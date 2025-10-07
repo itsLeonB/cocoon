@@ -1,38 +1,48 @@
 package service
 
 import (
-	"crypto/tls"
+	"context"
 
+	brevo "github.com/getbrevo/brevo-go/lib"
 	"github.com/itsLeonB/cocoon/internal/config"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/rotisserie/eris"
-	"gopkg.in/gomail.v2"
 )
 
 type MailService interface {
-	Send(msg dto.MailMessage) error
+	Send(ctx context.Context, msg dto.MailMessage) error
 }
 
-type mailService struct {
-	dialer *gomail.Dialer
-	sender string
+type brevoMailService struct {
+	client     *brevo.APIClient
+	senderMail string
+	senderName string
 }
 
-func NewMailService(cfg config.Mail) MailService {
-	dialer := gomail.NewDialer(cfg.Host, cfg.Port, cfg.Username, cfg.Password)
-	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
-	return &mailService{dialer, cfg.Sender}
+func NewMailService(mailConfig config.Mail) MailService {
+	cfg := brevo.NewConfiguration()
+	cfg.AddDefaultHeader("api-key", mailConfig.ApiKey)
+	br := brevo.NewAPIClient(cfg)
+	return &brevoMailService{br, mailConfig.SenderMail, mailConfig.SenderName}
 }
 
-func (ms *mailService) Send(msg dto.MailMessage) error {
-	message := gomail.NewMessage()
-	message.SetHeader("From", ms.sender)
-	message.SetHeader("To", msg.Recipient)
-	message.SetHeader("Subject", msg.Subject)
-	message.SetBody(msg.BodyType, msg.Body)
+func (ms *brevoMailService) Send(ctx context.Context, msg dto.MailMessage) error {
+	mail := brevo.SendSmtpEmail{
+		Sender: &brevo.SendSmtpEmailSender{
+			Name:  ms.senderName,
+			Email: ms.senderMail,
+		},
+		To: []brevo.SendSmtpEmailTo{{
+			Email: msg.RecipientMail,
+			Name:  msg.RecipientName,
+		}},
+		Subject:     msg.Subject,
+		HtmlContent: msg.HTMLContent,
+		TextContent: msg.TextContent,
+	}
 
-	if err := ms.dialer.DialAndSend(message); err != nil {
-		return eris.Wrap(err, "error sending mail")
+	if _, _, err := ms.client.TransactionalEmailsApi.SendTransacEmail(ctx, mail); err != nil {
+		return eris.Wrap(err, "error sending email")
 	}
 	return nil
 }

@@ -3,6 +3,7 @@ module github.com/itsLeonB/cocoon
 go 1.25.0
 
 require (
+	github.com/getbrevo/brevo-go v1.1.3
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/google/uuid v1.6.0
 	github.com/itsLeonB/audit v0.1.0
@@ -21,7 +22,6 @@ require (
 	golang.org/x/oauth2 v0.30.0
 	google.golang.org/grpc v1.75.1
 	google.golang.org/protobuf v1.36.9
-	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.30.1
@@ -29,6 +29,7 @@ require (
 
 require (
 	cloud.google.com/go/compute/metadata v0.8.0 // indirect
+	github.com/antihax/optional v1.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -52,6 +53,5 @@ require (
 	golang.org/x/text v0.28.0 // indirect
 	google.golang.org/genproto v0.0.0-20250908214217-97024824d090 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250826171959-ef028d996bc1 // indirect
-	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

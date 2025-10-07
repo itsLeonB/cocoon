@@ -1,9 +1,7 @@
 package config
 
 type Mail struct {
-	Sender   string `required:"true"`
-	Host     string `required:"true"`
-	Username string `required:"true"`
-	Password string `required:"true"`
-	Port     int    `required:"true"`
+	SenderMail string `split_words:"true" required:"true"`
+	SenderName string `split_words:"true" required:"true"`
+	ApiKey     string `split_words:"true" required:"true"`
 }
