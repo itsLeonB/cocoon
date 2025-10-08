@@ -21,8 +21,9 @@ func TestProfileService_Create_Success(t *testing.T) {
 
 	mockTransactor := crud.NewMockTransactor(ctrl)
 	mockProfileRepo := mocks.NewMockUserProfileRepository(ctrl)
+	mockUserRepo := crud.NewMockRepository[entity.User](ctrl)
 
-	profileService := service.NewProfileService(mockTransactor, mockProfileRepo)
+	profileService := service.NewProfileService(mockTransactor, mockProfileRepo, mockUserRepo)
 
 	ctx := context.Background()
 	userID := uuid.New()
@@ -58,8 +59,9 @@ func TestProfileService_GetByID_Success(t *testing.T) {
 
 	mockTransactor := crud.NewMockTransactor(ctrl)
 	mockProfileRepo := mocks.NewMockUserProfileRepository(ctrl)
+	mockUserRepo := crud.NewMockRepository[entity.User](ctrl)
 
-	profileService := service.NewProfileService(mockTransactor, mockProfileRepo)
+	profileService := service.NewProfileService(mockTransactor, mockProfileRepo, mockUserRepo)
 
 	ctx := context.Background()
 	profileID := uuid.New()
@@ -87,8 +89,9 @@ func TestProfileService_GetByIDs_Success(t *testing.T) {
 
 	mockTransactor := crud.NewMockTransactor(ctrl)
 	mockProfileRepo := mocks.NewMockUserProfileRepository(ctrl)
+	mockUserRepo := crud.NewMockRepository[entity.User](ctrl)
 
-	profileService := service.NewProfileService(mockTransactor, mockProfileRepo)
+	profileService := service.NewProfileService(mockTransactor, mockProfileRepo, mockUserRepo)
 
 	ctx := context.Background()
 	profileID1 := uuid.New()
@@ -118,8 +121,9 @@ func TestProfileService_Create_Error(t *testing.T) {
 
 	mockTransactor := crud.NewMockTransactor(ctrl)
 	mockProfileRepo := mocks.NewMockUserProfileRepository(ctrl)
+	mockUserRepo := crud.NewMockRepository[entity.User](ctrl)
 
-	profileService := service.NewProfileService(mockTransactor, mockProfileRepo)
+	profileService := service.NewProfileService(mockTransactor, mockProfileRepo, mockUserRepo)
 
 	ctx := context.Background()
 	request := dto.NewProfileRequest{

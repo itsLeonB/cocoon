@@ -24,7 +24,7 @@ func TestProfileToResponse(t *testing.T) {
 	profile.CreatedAt = now
 	profile.UpdatedAt = now
 
-	response := mapper.ProfileToResponse(profile)
+	response := mapper.ProfileToResponse(profile, "")
 
 	assert.Equal(t, profileID, response.ID)
 	assert.Equal(t, userID, response.UserID)
@@ -45,7 +45,7 @@ func TestProfileToResponse_WithDeletedAt(t *testing.T) {
 	profile.DeletedAt.Time = now
 	profile.DeletedAt.Valid = true
 
-	response := mapper.ProfileToResponse(profile)
+	response := mapper.ProfileToResponse(profile, "")
 
 	assert.Equal(t, userID, response.UserID)
 	assert.Equal(t, "Deleted User", response.Name)

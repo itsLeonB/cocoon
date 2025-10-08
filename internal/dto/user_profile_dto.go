@@ -11,6 +11,7 @@ type ProfileResponse struct {
 	UserID    uuid.UUID
 	Name      string
 	Avatar    string
+	Email     string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time

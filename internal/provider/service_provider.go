@@ -23,6 +23,7 @@ func ProvideServices(
 	profileService := service.NewProfileService(
 		repos.Transactor,
 		repos.UserProfile,
+		repos.User,
 	)
 
 	userSvc := service.NewUserService(

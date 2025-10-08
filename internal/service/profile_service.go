@@ -17,15 +17,18 @@ import (
 type profileServiceImpl struct {
 	transactor  crud.Transactor
 	profileRepo repository.UserProfileRepository
+	userRepo    crud.Repository[entity.User]
 }
 
 func NewProfileService(
 	transactor crud.Transactor,
 	profileRepo repository.UserProfileRepository,
+	userRepo crud.Repository[entity.User],
 ) ProfileService {
 	return &profileServiceImpl{
 		transactor,
 		profileRepo,
+		userRepo,
 	}
 }
 
@@ -44,7 +47,7 @@ func (ps *profileServiceImpl) Create(ctx context.Context, request dto.NewProfile
 			return err
 		}
 
-		response = mapper.ProfileToResponse(insertedProfile)
+		response = mapper.ProfileToResponse(insertedProfile, "")
 
 		return nil
 	})
@@ -66,7 +69,14 @@ func (ps *profileServiceImpl) GetByID(ctx context.Context, id uuid.UUID) (dto.Pr
 		return dto.ProfileResponse{}, ungerr.ConflictError(fmt.Sprintf("profile with ID: %s is already deleted", id))
 	}
 
-	return mapper.ProfileToResponse(profile), nil
+	userSpec := crud.Specification[entity.User]{}
+	userSpec.Model.ID = profile.UserID
+	user, err := ps.userRepo.FindFirst(ctx, userSpec)
+	if err != nil {
+		return dto.ProfileResponse{}, err
+	}
+
+	return mapper.ProfileToResponse(profile, user.Email), nil
 }
 
 func (ps *profileServiceImpl) GetByIDs(ctx context.Context, ids []uuid.UUID) ([]dto.ProfileResponse, error) {
@@ -75,7 +85,7 @@ func (ps *profileServiceImpl) GetByIDs(ctx context.Context, ids []uuid.UUID) ([]
 		return nil, err
 	}
 
-	return ezutil.MapSlice(profiles, mapper.ProfileToResponse), nil
+	return ezutil.MapSlice(profiles, mapper.SimpleProfileToResponse), nil
 }
 
 func (ps *profileServiceImpl) Update(ctx context.Context, req dto.UpdateProfileRequest) (dto.ProfileResponse, error) {
@@ -110,7 +120,7 @@ func (ps *profileServiceImpl) Update(ctx context.Context, req dto.UpdateProfileR
 			return err
 		}
 
-		response = mapper.ProfileToResponse(updatedProfile)
+		response = mapper.ProfileToResponse(updatedProfile, "")
 		return nil
 	})
 	return response, err
