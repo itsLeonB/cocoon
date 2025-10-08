@@ -24,22 +24,28 @@ type googleProviderService struct {
 	userInfoURL string
 	cfg         *oauth2.Config
 	logger      ezutil.Logger
+	httpClient  *http.Client
 }
 
-func newGoogleProviderService(logger ezutil.Logger, cfg config.OAuthProvider) ProviderService {
+func newGoogleProviderService(
+	logger ezutil.Logger,
+	oauthConfig config.OAuthProvider,
+	httpClient *http.Client,
+) ProviderService {
 	return &googleProviderService{
 		userInfoURL: "https://www.googleapis.com/oauth2/v2/userinfo",
 		cfg: &oauth2.Config{
-			ClientID:     cfg.ClientID,
-			ClientSecret: cfg.ClientSecret,
-			RedirectURL:  cfg.RedirectUrl,
+			ClientID:     oauthConfig.ClientID,
+			ClientSecret: oauthConfig.ClientSecret,
+			RedirectURL:  oauthConfig.RedirectUrl,
 			Endpoint:     google.Endpoint,
 			Scopes: []string{
 				"https://www.googleapis.com/auth/userinfo.email",
 				"https://www.googleapis.com/auth/userinfo.profile",
 			},
 		},
-		logger: logger,
+		logger:     logger,
+		httpClient: httpClient,
 	}
 }
 
@@ -67,7 +73,7 @@ func (gps *googleProviderService) HandleCallback(ctx context.Context, code strin
 	}
 	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := gps.httpClient.Do(req)
 	if err != nil {
 		return UserInfo{}, eris.Wrap(err, "error making HTTP request")
 	}

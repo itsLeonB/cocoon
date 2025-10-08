@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"net/http"
 	"time"
 
 	"github.com/itsLeonB/cocoon/internal/appconstant"
@@ -36,11 +37,12 @@ func NewOAuthService(
 	configs config.Config,
 	stateStore store.StateStore,
 	userSvc UserService,
+	httpClient *http.Client,
 ) OAuthService {
 	return &oauthServiceImpl{
 		sekure.NewJwtService(configs.Issuer, configs.SecretKey, configs.TokenDuration),
 		transactor,
-		oauth.NewOAuthProviderServices(logger, configs.OAuthProviders),
+		oauth.NewOAuthProviderServices(logger, configs.OAuthProviders, httpClient),
 		oauthAccountRepo,
 		stateStore,
 		userSvc,

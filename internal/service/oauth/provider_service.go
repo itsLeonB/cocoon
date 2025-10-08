@@ -2,6 +2,7 @@ package oauth
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/itsLeonB/cocoon/internal/config"
 	"github.com/itsLeonB/ezutil/v2"
@@ -13,8 +14,12 @@ type ProviderService interface {
 	HandleCallback(ctx context.Context, code string) (UserInfo, error)
 }
 
-func NewOAuthProviderServices(logger ezutil.Logger, cfgs config.OAuthProviders) map[string]ProviderService {
+func NewOAuthProviderServices(
+	logger ezutil.Logger,
+	cfgs config.OAuthProviders,
+	httpClient *http.Client,
+) map[string]ProviderService {
 	return map[string]ProviderService{
-		"google": newGoogleProviderService(logger, cfgs.Google),
+		"google": newGoogleProviderService(logger, cfgs.Google, httpClient),
 	}
 }

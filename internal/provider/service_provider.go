@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"net/http"
+
 	"github.com/itsLeonB/cocoon/internal/config"
 	"github.com/itsLeonB/cocoon/internal/service"
 	"github.com/itsLeonB/cocoon/internal/store"
@@ -19,6 +21,7 @@ func ProvideServices(
 	repos *Repositories,
 	logger ezutil.Logger,
 	store store.StateStore,
+	httpClient *http.Client,
 ) (*Services, error) {
 	profileService := service.NewProfileService(
 		repos.Transactor,
@@ -49,6 +52,7 @@ func ProvideServices(
 		configs,
 		store,
 		userSvc,
+		httpClient,
 	)
 
 	friendshipService := service.NewFriendshipService(
