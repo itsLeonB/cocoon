@@ -13,6 +13,8 @@ type AuthService interface {
 	Login(ctx context.Context, request dto.LoginRequest) (dto.LoginResponse, error)
 	VerifyToken(ctx context.Context, token string) (dto.AuthData, error)
 	VerifyRegistration(ctx context.Context, token string) (dto.LoginResponse, error)
+	SendResetPassword(ctx context.Context, resetURL, email string) error
+	ResetPassword(ctx context.Context, token, newPassword string) (dto.LoginResponse, error)
 }
 
 type OAuthService interface {
@@ -25,6 +27,8 @@ type UserService interface {
 	GetByID(ctx context.Context, id uuid.UUID) (dto.UserResponse, error)
 	FindByEmail(ctx context.Context, email string) (entity.User, error)
 	Verify(ctx context.Context, id uuid.UUID, email string) (entity.User, error)
+	GeneratePasswordResetToken(ctx context.Context, userID uuid.UUID) (string, error)
+	ResetPassword(ctx context.Context, userID uuid.UUID, email, resetToken, password string) (entity.User, error)
 }
 
 type ProfileService interface {

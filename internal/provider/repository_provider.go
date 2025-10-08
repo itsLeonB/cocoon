@@ -8,19 +8,21 @@ import (
 )
 
 type Repositories struct {
-	Transactor   crud.Transactor
-	User         crud.Repository[entity.User]
-	UserProfile  repository.UserProfileRepository
-	Friendship   repository.FriendshipRepository
-	OAuthAccount crud.Repository[entity.OAuthAccount]
+	Transactor         crud.Transactor
+	User               crud.Repository[entity.User]
+	UserProfile        repository.UserProfileRepository
+	Friendship         repository.FriendshipRepository
+	OAuthAccount       crud.Repository[entity.OAuthAccount]
+	PasswordResetToken crud.Repository[entity.PasswordResetToken]
 }
 
 func ProvideRepositories(db *gorm.DB) *Repositories {
 	return &Repositories{
-		Transactor:   crud.NewTransactor(db),
-		User:         crud.NewRepository[entity.User](db),
-		UserProfile:  repository.NewProfileRepository(db),
-		Friendship:   repository.NewFriendshipRepository(db),
-		OAuthAccount: crud.NewRepository[entity.OAuthAccount](db),
+		Transactor:         crud.NewTransactor(db),
+		User:               crud.NewRepository[entity.User](db),
+		UserProfile:        repository.NewProfileRepository(db),
+		Friendship:         repository.NewFriendshipRepository(db),
+		OAuthAccount:       crud.NewRepository[entity.OAuthAccount](db),
+		PasswordResetToken: crud.NewRepository[entity.PasswordResetToken](db),
 	}
 }

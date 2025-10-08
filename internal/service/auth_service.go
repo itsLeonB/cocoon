@@ -168,6 +168,65 @@ func (as *authServiceImpl) VerifyToken(ctx context.Context, token string) (dto.A
 	}, nil
 }
 
+func (as *authServiceImpl) SendResetPassword(ctx context.Context, resetURL, email string) error {
+	return as.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
+		user, err := as.userSvc.FindByEmail(ctx, email)
+		if err != nil {
+			return err
+		}
+		if user.IsZero() || user.IsDeleted() || !user.IsVerified() {
+			return nil
+		}
+
+		resetToken, err := as.userSvc.GeneratePasswordResetToken(ctx, user.ID)
+		if err != nil {
+			return err
+		}
+
+		return as.sendResetPasswordMail(ctx, user, resetURL, resetToken)
+	})
+}
+
+func (as *authServiceImpl) ResetPassword(ctx context.Context, token, newPassword string) (dto.LoginResponse, error) {
+	var response dto.LoginResponse
+	err := as.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
+		claims, err := as.jwtService.VerifyToken(token)
+		if err != nil {
+			return err
+		}
+		id, ok := claims.Data["id"].(string)
+		if !ok {
+			return eris.New("error asserting id, is not a string")
+		}
+		userID, err := ezutil.Parse[uuid.UUID](id)
+		if err != nil {
+			return err
+		}
+		email, ok := claims.Data["email"].(string)
+		if !ok {
+			return eris.New("error asserting email, is not a string")
+		}
+		resetToken, ok := claims.Data["reset_token"].(string)
+		if !ok {
+			return eris.New("error asserting reset_token, is not a string")
+		}
+
+		hashedPassword, err := as.hashService.Hash(newPassword)
+		if err != nil {
+			return err
+		}
+
+		user, err := as.userSvc.ResetPassword(ctx, userID, email, resetToken, hashedPassword)
+		if err != nil {
+			return err
+		}
+
+		response, err = as.createLoginResponse(user)
+		return err
+	})
+	return response, err
+}
+
 func (as *authServiceImpl) createLoginResponse(user entity.User) (dto.LoginResponse, error) {
 	authData := mapper.UserToAuthData(user)
 
@@ -198,6 +257,30 @@ func (as *authServiceImpl) sendVerificationMail(ctx context.Context, user entity
 		RecipientName: util.GetNameFromEmail(user.Email),
 		Subject:       "Verify your email",
 		TextContent:   "Please verify your email by clicking the following link:\n\n" + url,
+	}
+
+	return as.mailSvc.Send(ctx, mailMsg)
+}
+
+func (as *authServiceImpl) sendResetPasswordMail(ctx context.Context, user entity.User, resetURL, resetToken string) error {
+	claims := map[string]any{
+		"id":          user.ID,
+		"email":       user.Email,
+		"reset_token": resetToken,
+	}
+
+	token, err := as.jwtService.CreateToken(claims)
+	if err != nil {
+		return err
+	}
+
+	url := fmt.Sprintf("%s?token=%s", resetURL, token)
+
+	mailMsg := dto.MailMessage{
+		RecipientMail: user.Email,
+		RecipientName: user.Profile.Name,
+		Subject:       "Reset your password",
+		TextContent:   "You have requested to reset your password.\nIf this is not you, ignore this mail.\nPlease reset your password by clicking the following link:\n\n" + url,
 	}
 
 	return as.mailSvc.Send(ctx, mailMsg)

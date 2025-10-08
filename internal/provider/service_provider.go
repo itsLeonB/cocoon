@@ -29,6 +29,7 @@ func ProvideServices(
 		repos.Transactor,
 		repos.User,
 		profileService,
+		repos.PasswordResetToken,
 	)
 
 	mailSvc := service.NewMailService(configs.Mail)
