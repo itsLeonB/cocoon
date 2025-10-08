@@ -6,10 +6,10 @@ import (
 )
 
 type HTTPClient struct {
-	MaxIdleConns        int           `default:"10"`
-	MaxIdleConnsPerHost int           `default:"2"`
-	IdleConnTimeout     time.Duration `default:"30s"`
-	Timeout             time.Duration `default:"10s"`
+	MaxIdleConns        int           `split_words:"true" default:"10"`
+	MaxIdleConnsPerHost int           `split_words:"true" default:"2"`
+	IdleConnTimeout     time.Duration `split_words:"true" default:"30s"`
+	Timeout             time.Duration `split_words:"true" default:"10s"`
 }
 
 func (h HTTPClient) NewClient() *http.Client {

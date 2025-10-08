@@ -67,7 +67,7 @@ func Load() (Config, error) {
 	}
 
 	var http HTTPClient
-	if err = envconfig.Process("HTTP", &http); err != nil {
+	if err = envconfig.Process("HTTP_CLIENT", &http); err != nil {
 		return Config{}, eris.Wrap(err, errMsg)
 	}
 

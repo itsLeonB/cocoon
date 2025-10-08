@@ -9,7 +9,7 @@ type DB struct {
 	User            string        `required:"true"`
 	Password        string        `required:"true"`
 	Name            string        `required:"true" default:"cocoon"`
-	MaxOpenConns    int           `default:"25"`
-	MaxIdleConns    int           `default:"5"`
-	ConnMaxLifetime time.Duration `default:"5m"`
+	MaxOpenConns    int           `split_words:"true" default:"25"`
+	MaxIdleConns    int           `split_words:"true" default:"5"`
+	ConnMaxLifetime time.Duration `split_words:"true" default:"5m"`
 }

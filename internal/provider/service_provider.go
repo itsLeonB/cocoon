@@ -7,6 +7,7 @@ import (
 	"github.com/itsLeonB/cocoon/internal/service"
 	"github.com/itsLeonB/cocoon/internal/store"
 	"github.com/itsLeonB/ezutil/v2"
+	"github.com/rotisserie/eris"
 )
 
 type Services struct {
@@ -23,6 +24,10 @@ func ProvideServices(
 	store store.StateStore,
 	httpClient *http.Client,
 ) (*Services, error) {
+	if httpClient == nil {
+		return nil, eris.New("httpClient cannot be nil")
+	}
+
 	profileService := service.NewProfileService(
 		repos.Transactor,
 		repos.UserProfile,
