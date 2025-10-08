@@ -91,6 +91,13 @@ func (as *oauthServiceImpl) HandleOAuthCallback(ctx context.Context, data dto.OA
 		if err != nil {
 			return err
 		}
+
+		if !user.IsVerified() {
+			if _, err = as.userSvc.Verify(ctx, user.ID, user.Email); err != nil {
+				return err
+			}
+		}
+
 		response, err = as.createLoginResponse(user)
 		return err
 	})
@@ -107,7 +114,7 @@ func (as *oauthServiceImpl) getOrCreateUser(ctx context.Context, userInfo oauth.
 		if existingOAuth.User.IsDeleted() {
 			return entity.User{}, ungerr.NotFoundError(appconstant.ErrAuthUnknownCredentials)
 		}
-		return existingOAuth.User, err
+		return existingOAuth.User, nil
 	}
 	return as.createNewUserOAuth(ctx, userInfo)
 }

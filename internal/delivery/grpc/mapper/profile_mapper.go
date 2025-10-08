@@ -18,6 +18,7 @@ func ToProfileResponseProto(res dto.ProfileResponse) *profile.ProfileResponse {
 			UserId: res.UserID.String(),
 			Name:   res.Name,
 			Avatar: res.Avatar,
+			Email:  res.Email,
 		},
 		AuditMetadata: &audit.Metadata{
 			Id:        res.ID.String(),

@@ -10,6 +10,7 @@ import (
 	"github.com/itsLeonB/cocoon/internal/service"
 	"github.com/itsLeonB/ungerr"
 	"github.com/rotisserie/eris"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type AuthServer struct {
@@ -147,6 +148,41 @@ func (as *AuthServer) VerifyRegistration(ctx context.Context, req *auth.VerifyRe
 	}
 
 	response, err := as.authService.VerifyRegistration(ctx, req.GetToken())
+	if err != nil {
+		return nil, err
+	}
+
+	return &auth.LoginResponse{
+		Type:  response.Type,
+		Token: response.Token,
+	}, nil
+}
+
+func (as *AuthServer) SendResetPassword(ctx context.Context, req *auth.SendResetPasswordRequest) (*emptypb.Empty, error) {
+	if req == nil {
+		return nil, eris.New(appconstant.ErrNilRequest)
+	}
+	if req.GetEmail() == "" {
+		return nil, ungerr.BadRequestError("email is empty")
+	}
+	if req.GetResetUrl() == "" {
+		return nil, ungerr.BadRequestError("resetUrl is empty")
+	}
+	return nil, as.authService.SendResetPassword(ctx, req.GetResetUrl(), req.GetEmail())
+}
+
+func (as *AuthServer) ResetPassword(ctx context.Context, req *auth.ResetPasswordRequest) (*auth.LoginResponse, error) {
+	if req == nil {
+		return nil, eris.New(appconstant.ErrNilRequest)
+	}
+	if req.GetToken() == "" {
+		return nil, ungerr.BadRequestError("token is empty")
+	}
+	if req.GetNewPassword() == "" {
+		return nil, ungerr.BadRequestError("newPassword is empty")
+	}
+
+	response, err := as.authService.ResetPassword(ctx, req.GetToken(), req.GetNewPassword())
 	if err != nil {
 		return nil, err
 	}

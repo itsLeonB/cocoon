@@ -6,8 +6,9 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/itsLeonB/cocoon/internal/entity"
+	"github.com/itsLeonB/cocoon/internal/mocks"
 	"github.com/itsLeonB/cocoon/internal/service"
-	"github.com/itsLeonB/cocoon/internal/test/service_test/mocks"
+	"github.com/itsLeonB/go-crud"
 	"github.com/rotisserie/eris"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -17,7 +18,7 @@ func TestFriendshipService_IsFriends_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockTransactor := mocks.NewMockTransactor(ctrl)
+	mockTransactor := crud.NewMockTransactor(ctrl)
 	mockFriendshipRepo := mocks.NewMockFriendshipRepository(ctrl)
 	mockProfileService := mocks.NewMockProfileService(ctrl)
 
@@ -50,7 +51,7 @@ func TestFriendshipService_IsFriends_NotFound(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockTransactor := mocks.NewMockTransactor(ctrl)
+	mockTransactor := crud.NewMockTransactor(ctrl)
 	mockFriendshipRepo := mocks.NewMockFriendshipRepository(ctrl)
 	mockProfileService := mocks.NewMockProfileService(ctrl)
 
@@ -77,7 +78,7 @@ func TestFriendshipService_IsFriends_Error(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockTransactor := mocks.NewMockTransactor(ctrl)
+	mockTransactor := crud.NewMockTransactor(ctrl)
 	mockFriendshipRepo := mocks.NewMockFriendshipRepository(ctrl)
 	mockProfileService := mocks.NewMockProfileService(ctrl)
 

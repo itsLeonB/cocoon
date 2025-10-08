@@ -23,12 +23,14 @@ func ProvideServices(
 	profileService := service.NewProfileService(
 		repos.Transactor,
 		repos.UserProfile,
+		repos.User,
 	)
 
 	userSvc := service.NewUserService(
 		repos.Transactor,
 		repos.User,
 		profileService,
+		repos.PasswordResetToken,
 	)
 
 	mailSvc := service.NewMailService(configs.Mail)
