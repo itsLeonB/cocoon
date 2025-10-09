@@ -11,10 +11,11 @@ import (
 )
 
 type Services struct {
-	Auth       service.AuthService
-	OAuth      service.OAuthService
-	Profile    service.ProfileService
-	Friendship service.FriendshipService
+	Auth              service.AuthService
+	OAuth             service.OAuthService
+	Profile           service.ProfileService
+	Friendship        service.FriendshipService
+	FriendshipRequest service.FriendshipRequestService
 }
 
 func ProvideServices(
@@ -66,10 +67,18 @@ func ProvideServices(
 		profileService,
 	)
 
+	friendshipReqSvc := service.NewFriendshipRequestService(
+		repos.Transactor,
+		friendshipService,
+		profileService,
+		repos.FriendshipRequest,
+	)
+
 	return &Services{
-		Auth:       authService,
-		OAuth:      oAuthSvc,
-		Profile:    profileService,
-		Friendship: friendshipService,
+		Auth:              authService,
+		OAuth:             oAuthSvc,
+		Profile:           profileService,
+		Friendship:        friendshipService,
+		FriendshipRequest: friendshipReqSvc,
 	}, nil
 }

@@ -43,6 +43,18 @@ type FriendshipService interface {
 	GetAll(ctx context.Context, profileID uuid.UUID) ([]dto.FriendshipResponse, error)
 	GetDetails(ctx context.Context, profileID, friendshipID uuid.UUID) (dto.FriendDetails, error)
 	IsFriends(ctx context.Context, profileID1, profileID2 uuid.UUID) (bool, bool, error)
+	CreateReal(ctx context.Context, userProfileID, friendProfileID uuid.UUID) (dto.FriendshipResponse, error)
+}
+
+type FriendshipRequestService interface {
+	Send(ctx context.Context, userProfileID, friendProfileID uuid.UUID, message string) error
+	GetAllSent(ctx context.Context, userProfileID uuid.UUID) ([]dto.FriendshipRequestResponse, error)
+	Cancel(ctx context.Context, userProfileID, reqID uuid.UUID) error
+	GetAllReceived(ctx context.Context, userProfileID uuid.UUID) ([]dto.FriendshipRequestResponse, error)
+	Ignore(ctx context.Context, userProfileID, reqID uuid.UUID) error
+	Block(ctx context.Context, userProfileID, reqID uuid.UUID) error
+	Unblock(ctx context.Context, userProfileID, reqID uuid.UUID) error
+	Accept(ctx context.Context, userProfileID, reqID uuid.UUID) (dto.FriendshipResponse, error)
 }
 
 type MailService interface {

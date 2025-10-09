@@ -11,18 +11,20 @@ import (
 )
 
 type Servers struct {
-	Auth       auth.AuthServiceServer
-	Profile    profile.ProfileServiceServer
-	Friendship friendship.FriendshipServiceServer
+	Auth              auth.AuthServiceServer
+	Profile           profile.ProfileServiceServer
+	Friendship        friendship.FriendshipServiceServer
+	FriendshipRequest friendship.RequestServiceServer
 }
 
 func ProvideServers(services *provider.Services) *Servers {
 	validate := validator.New()
 
 	return &Servers{
-		Auth:       NewAuthServer(validate, services.Auth, services.OAuth),
-		Profile:    NewProfileServer(validate, services.Profile),
-		Friendship: NewFriendshipServer(validate, services.Friendship),
+		Auth:              newAuthServer(validate, services.Auth, services.OAuth),
+		Profile:           newProfileServer(validate, services.Profile),
+		Friendship:        newFriendshipServer(validate, services.Friendship),
+		FriendshipRequest: newFriendshipRequestServer(services.FriendshipRequest),
 	}
 }
 

@@ -14,23 +14,23 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-type FriendshipServer struct {
+type friendshipServer struct {
 	friendship.UnimplementedFriendshipServiceServer
 	validate          *validator.Validate
 	friendshipService service.FriendshipService
 }
 
-func NewFriendshipServer(
+func newFriendshipServer(
 	validate *validator.Validate,
 	friendshipService service.FriendshipService,
 ) friendship.FriendshipServiceServer {
-	return &FriendshipServer{
+	return &friendshipServer{
 		validate:          validate,
 		friendshipService: friendshipService,
 	}
 }
 
-func (fs *FriendshipServer) CreateAnonymous(ctx context.Context, req *friendship.CreateAnonymousRequest) (*friendship.CreateAnonymousResponse, error) {
+func (fs *friendshipServer) CreateAnonymous(ctx context.Context, req *friendship.CreateAnonymousRequest) (*friendship.CreateAnonymousResponse, error) {
 	profileID, err := ezutil.Parse[uuid.UUID](req.GetProfileId())
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (fs *FriendshipServer) CreateAnonymous(ctx context.Context, req *friendship
 	}, nil
 }
 
-func (fs *FriendshipServer) GetAll(ctx context.Context, req *friendship.GetAllRequest) (*friendship.GetAllResponse, error) {
+func (fs *friendshipServer) GetAll(ctx context.Context, req *friendship.GetAllRequest) (*friendship.GetAllResponse, error) {
 	profileID, err := ezutil.Parse[uuid.UUID](req.GetProfileId())
 	if err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func (fs *FriendshipServer) GetAll(ctx context.Context, req *friendship.GetAllRe
 	return &friendship.GetAllResponse{Friendships: friendships}, nil
 }
 
-func (fs *FriendshipServer) GetDetails(ctx context.Context, req *friendship.GetDetailsRequest) (*friendship.GetDetailsResponse, error) {
+func (fs *friendshipServer) GetDetails(ctx context.Context, req *friendship.GetDetailsRequest) (*friendship.GetDetailsResponse, error) {
 	profileID, err := ezutil.Parse[uuid.UUID](req.GetProfileId())
 	if err != nil {
 		return nil, err
@@ -116,7 +116,7 @@ func (fs *FriendshipServer) GetDetails(ctx context.Context, req *friendship.GetD
 	}, nil
 }
 
-func (fs *FriendshipServer) IsFriends(ctx context.Context, req *friendship.IsFriendsRequest) (*friendship.IsFriendsResponse, error) {
+func (fs *friendshipServer) IsFriends(ctx context.Context, req *friendship.IsFriendsRequest) (*friendship.IsFriendsResponse, error) {
 	profileID1, err := ezutil.Parse[uuid.UUID](req.GetProfileId_1())
 	if err != nil {
 		return nil, err

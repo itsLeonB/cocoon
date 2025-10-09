@@ -13,23 +13,23 @@ import (
 	"github.com/itsLeonB/ungerr"
 )
 
-type ProfileServer struct {
+type profileServer struct {
 	profile.UnimplementedProfileServiceServer
 	validate       *validator.Validate
 	profileService service.ProfileService
 }
 
-func NewProfileServer(
+func newProfileServer(
 	validate *validator.Validate,
 	profileService service.ProfileService,
 ) profile.ProfileServiceServer {
-	return &ProfileServer{
+	return &profileServer{
 		validate:       validate,
 		profileService: profileService,
 	}
 }
 
-func (ps *ProfileServer) Get(ctx context.Context, req *profile.GetRequest) (*profile.GetResponse, error) {
+func (ps *profileServer) Get(ctx context.Context, req *profile.GetRequest) (*profile.GetResponse, error) {
 	id, err := uuid.Parse(req.GetProfileId())
 	if err != nil {
 		return nil, ungerr.ValidationError("profile_id is not a valid uuid")
@@ -45,7 +45,7 @@ func (ps *ProfileServer) Get(ctx context.Context, req *profile.GetRequest) (*pro
 	}, nil
 }
 
-func (ps *ProfileServer) Create(ctx context.Context, req *profile.CreateRequest) (*profile.CreateResponse, error) {
+func (ps *profileServer) Create(ctx context.Context, req *profile.CreateRequest) (*profile.CreateResponse, error) {
 	var userID uuid.UUID
 	if req.GetUserId() != "" {
 		parsedID, err := ezutil.Parse[uuid.UUID](req.GetUserId())
@@ -74,7 +74,7 @@ func (ps *ProfileServer) Create(ctx context.Context, req *profile.CreateRequest)
 	}, nil
 }
 
-func (ps *ProfileServer) GetByIDs(ctx context.Context, req *profile.GetByIDsRequest) (*profile.GetByIDsResponse, error) {
+func (ps *profileServer) GetByIDs(ctx context.Context, req *profile.GetByIDsRequest) (*profile.GetByIDsResponse, error) {
 	profileIDs, err := ezutil.MapSliceWithError(req.GetProfileIds(), ezutil.Parse[uuid.UUID])
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func (ps *ProfileServer) GetByIDs(ctx context.Context, req *profile.GetByIDsRequ
 	return &profile.GetByIDsResponse{Profiles: responses}, nil
 }
 
-func (ps *ProfileServer) Update(ctx context.Context, req *profile.UpdateRequest) (*profile.UpdateResponse, error) {
+func (ps *profileServer) Update(ctx context.Context, req *profile.UpdateRequest) (*profile.UpdateResponse, error) {
 	request, err := mapper.FromUpdateProfileRequestProto(req)
 	if err != nil {
 		return nil, err

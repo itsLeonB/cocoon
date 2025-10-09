@@ -12,6 +12,7 @@ type Repositories struct {
 	User               crud.Repository[entity.User]
 	UserProfile        repository.UserProfileRepository
 	Friendship         repository.FriendshipRepository
+	FriendshipRequest  crud.Repository[entity.FriendshipRequest]
 	OAuthAccount       crud.Repository[entity.OAuthAccount]
 	PasswordResetToken crud.Repository[entity.PasswordResetToken]
 }
@@ -22,6 +23,7 @@ func ProvideRepositories(db *gorm.DB) *Repositories {
 		User:               crud.NewRepository[entity.User](db),
 		UserProfile:        repository.NewProfileRepository(db),
 		Friendship:         repository.NewFriendshipRepository(db),
+		FriendshipRequest:  crud.NewRepository[entity.FriendshipRequest](db),
 		OAuthAccount:       crud.NewRepository[entity.OAuthAccount](db),
 		PasswordResetToken: crud.NewRepository[entity.PasswordResetToken](db),
 	}
