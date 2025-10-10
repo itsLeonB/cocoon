@@ -7,7 +7,7 @@ import (
 
 func ProfileToResponse(profile entity.UserProfile, email string) dto.ProfileResponse {
 	return dto.ProfileResponse{
-		UserID:    profile.UserID,
+		UserID:    profile.UserID.UUID,
 		ID:        profile.ID,
 		Name:      profile.Name,
 		Avatar:    profile.Avatar,

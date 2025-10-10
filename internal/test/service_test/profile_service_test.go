@@ -9,6 +9,7 @@ import (
 	"github.com/itsLeonB/cocoon/internal/entity"
 	"github.com/itsLeonB/cocoon/internal/mocks"
 	"github.com/itsLeonB/cocoon/internal/service"
+	"github.com/itsLeonB/cocoon/internal/util"
 	"github.com/itsLeonB/go-crud"
 	"github.com/rotisserie/eris"
 	"github.com/stretchr/testify/assert"
@@ -33,7 +34,7 @@ func TestProfileService_Create_Success(t *testing.T) {
 	}
 
 	insertedProfile := entity.UserProfile{
-		UserID: userID,
+		UserID: util.NewValidNullUUID(userID),
 		Name:   "John Doe",
 	}
 	insertedProfile.ID = uuid.New()
@@ -68,12 +69,13 @@ func TestProfileService_GetByID_Success(t *testing.T) {
 	userID := uuid.New()
 
 	profile := entity.UserProfile{
-		UserID: userID,
+		UserID: util.NewValidNullUUID(userID),
 		Name:   "John Doe",
 	}
 	profile.ID = profileID
 
 	mockProfileRepo.EXPECT().FindFirst(ctx, gomock.Any()).Return(profile, nil)
+	mockUserRepo.EXPECT().FindFirst(ctx, gomock.Any())
 
 	response, err := profileService.GetByID(ctx, profileID)
 
@@ -99,8 +101,8 @@ func TestProfileService_GetByIDs_Success(t *testing.T) {
 	ids := []uuid.UUID{profileID1, profileID2}
 
 	profiles := []entity.UserProfile{
-		{UserID: uuid.New(), Name: "User 1"},
-		{UserID: uuid.New(), Name: "User 2"},
+		{UserID: util.NewValidNullUUID(uuid.New()), Name: "User 1"},
+		{UserID: util.NewValidNullUUID(uuid.New()), Name: "User 2"},
 	}
 	profiles[0].ID = profileID1
 	profiles[1].ID = profileID2

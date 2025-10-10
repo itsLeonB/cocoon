@@ -105,3 +105,45 @@ func (ps *profileServer) Update(ctx context.Context, req *profile.UpdateRequest)
 		Profile: mapper.ToProfileResponseProto(response),
 	}, nil
 }
+
+func (ps *profileServer) GetByEmail(ctx context.Context, req *profile.GetByEmailRequest) (*profile.GetByEmailResponse, error) {
+	if req == nil {
+		return nil, ungerr.BadRequestError("request is nil")
+	}
+	if req.GetEmail() == "" {
+		return nil, ungerr.BadRequestError("email is empty")
+	}
+
+	response, err := ps.profileService.GetByEmail(ctx, req.GetEmail())
+	if err != nil {
+		return nil, err
+	}
+
+	return &profile.GetByEmailResponse{
+		Profile: mapper.ToProfileResponseProto(response),
+	}, nil
+}
+
+func (ps *profileServer) SearchByName(ctx context.Context, req *profile.SearchByNameRequest) (*profile.SearchByNameResponse, error) {
+	if req == nil {
+		return nil, ungerr.BadRequestError("request is nil")
+	}
+	if req.GetQuery() == "" {
+		return nil, ungerr.BadRequestError("query is empty")
+	}
+	if req.GetLimit() < 1 {
+		return nil, ungerr.BadRequestError("limit must be greater than 0")
+	}
+	if req.GetLimit() > 100 {
+		return nil, ungerr.BadRequestError("limit must be less than or equal to 100")
+	}
+
+	responses, err := ps.profileService.SearchByName(ctx, req.GetQuery(), int(req.GetLimit()))
+	if err != nil {
+		return nil, err
+	}
+
+	return &profile.SearchByNameResponse{
+		Profiles: ezutil.MapSlice(responses, mapper.ToProfileResponseProto),
+	}, nil
+}

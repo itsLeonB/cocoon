@@ -36,6 +36,8 @@ type ProfileService interface {
 	GetByID(ctx context.Context, id uuid.UUID) (dto.ProfileResponse, error)
 	GetByIDs(ctx context.Context, ids []uuid.UUID) ([]dto.ProfileResponse, error)
 	Update(ctx context.Context, req dto.UpdateProfileRequest) (dto.ProfileResponse, error)
+	GetByEmail(ctx context.Context, email string) (dto.ProfileResponse, error)
+	SearchByName(ctx context.Context, query string, limit int) ([]dto.ProfileResponse, error)
 }
 
 type FriendshipService interface {

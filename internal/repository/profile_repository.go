@@ -37,3 +37,16 @@ func (pr *profileRepositoryGorm) FindByIDs(ctx context.Context, ids []uuid.UUID)
 
 	return profiles, nil
 }
+
+func (pr *profileRepositoryGorm) SearchByName(ctx context.Context, query string, limit int) ([]entity.ProfileName, error) {
+	var results []entity.ProfileName
+	if err := pr.db.
+		Table("profile_names").
+		Where("name % ?", query).
+		Order(gorm.Expr("similarity(name, ?) DESC", query)).
+		Limit(limit).
+		Find(&results).Error; err != nil {
+		return nil, eris.Wrap(err, appconstant.ErrDataSelect)
+	}
+	return results, nil
+}
