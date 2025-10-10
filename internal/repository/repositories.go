@@ -11,6 +11,7 @@ import (
 type UserProfileRepository interface {
 	crud.Repository[entity.UserProfile]
 	FindByIDs(ctx context.Context, ids []uuid.UUID) ([]entity.UserProfile, error)
+	SearchByName(ctx context.Context, query string, limit int) ([]entity.ProfileName, error)
 }
 
 type FriendshipRepository interface {

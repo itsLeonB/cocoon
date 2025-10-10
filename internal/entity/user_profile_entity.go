@@ -7,7 +7,12 @@ import (
 
 type UserProfile struct {
 	crud.BaseEntity
-	UserID uuid.UUID
+	UserID uuid.NullUUID
 	Name   string
 	Avatar string
+}
+
+type ProfileName struct {
+	ID   uuid.UUID
+	Name string
 }

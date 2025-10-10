@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/itsLeonB/cocoon/internal/entity"
 	"github.com/itsLeonB/cocoon/internal/mapper"
+	"github.com/itsLeonB/cocoon/internal/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +17,7 @@ func TestProfileToResponse(t *testing.T) {
 	now := time.Now()
 
 	profile := entity.UserProfile{
-		UserID: userID,
+		UserID: util.NewValidNullUUID(userID),
 		Name:   "John Doe",
 		Avatar: "avatar.jpeg",
 	}
@@ -39,7 +40,7 @@ func TestProfileToResponse_WithDeletedAt(t *testing.T) {
 	now := time.Now()
 
 	profile := entity.UserProfile{
-		UserID: userID,
+		UserID: util.NewValidNullUUID(userID),
 		Name:   "Deleted User",
 	}
 	profile.DeletedAt.Time = now

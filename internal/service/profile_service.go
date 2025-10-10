@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/entity"
 	"github.com/itsLeonB/cocoon/internal/mapper"
@@ -37,7 +38,10 @@ func (ps *profileServiceImpl) Create(ctx context.Context, request dto.NewProfile
 
 	err := ps.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
 		newProfile := entity.UserProfile{
-			UserID: request.UserID,
+			UserID: uuid.NullUUID{
+				UUID:  request.UserID,
+				Valid: request.UserID != uuid.Nil,
+			},
 			Name:   request.Name,
 			Avatar: request.Avatar,
 		}
@@ -70,7 +74,7 @@ func (ps *profileServiceImpl) GetByID(ctx context.Context, id uuid.UUID) (dto.Pr
 	}
 
 	userSpec := crud.Specification[entity.User]{}
-	userSpec.Model.ID = profile.UserID
+	userSpec.Model.ID = profile.UserID.UUID
 	user, err := ps.userRepo.FindFirst(ctx, userSpec)
 	if err != nil {
 		return dto.ProfileResponse{}, err
@@ -93,8 +97,9 @@ func (ps *profileServiceImpl) Update(ctx context.Context, req dto.UpdateProfileR
 	err := ps.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
 		spec := crud.Specification[entity.UserProfile]{}
 		spec.Model.ID = req.ID
-		if req.UserID != uuid.Nil {
-			spec.Model.UserID = req.UserID
+		spec.Model.UserID = uuid.NullUUID{
+			UUID:  req.UserID,
+			Valid: req.UserID != uuid.Nil,
 		}
 		spec.DeletedFilter = crud.ExcludeDeleted
 		spec.ForUpdate = true
@@ -107,7 +112,10 @@ func (ps *profileServiceImpl) Update(ctx context.Context, req dto.UpdateProfileR
 		}
 
 		if req.UserID != uuid.Nil {
-			profile.UserID = req.UserID
+			profile.UserID = uuid.NullUUID{
+				UUID:  req.UserID,
+				Valid: true,
+			}
 		}
 		if req.Name != "" {
 			profile.Name = req.Name
@@ -124,4 +132,32 @@ func (ps *profileServiceImpl) Update(ctx context.Context, req dto.UpdateProfileR
 		return nil
 	})
 	return response, err
+}
+
+func (ps *profileServiceImpl) GetByEmail(ctx context.Context, email string) (dto.ProfileResponse, error) {
+	userSpec := crud.Specification[entity.User]{}
+	userSpec.Model.Email = email
+	userSpec.DeletedFilter = crud.ExcludeDeleted
+	userSpec.PreloadRelations = []string{"Profile"}
+	user, err := ps.userRepo.FindFirst(ctx, userSpec)
+	if err != nil {
+		return dto.ProfileResponse{}, err
+	}
+	if user.IsZero() || user.IsDeleted() || !user.IsVerified() {
+		return dto.ProfileResponse{}, ungerr.NotFoundError(appconstant.ErrUserNotFound)
+	}
+	return mapper.ProfileToResponse(user.Profile, user.Email), nil
+}
+
+func (ps *profileServiceImpl) SearchByName(ctx context.Context, query string, limit int) ([]dto.ProfileResponse, error) {
+	profileNames, err := ps.profileRepo.SearchByName(ctx, query, limit)
+	if err != nil {
+		return nil, err
+	}
+	if len(profileNames) < 1 {
+		return []dto.ProfileResponse{}, nil
+	}
+
+	ids := ezutil.MapSlice(profileNames, func(pn entity.ProfileName) uuid.UUID { return pn.ID })
+	return ps.GetByIDs(ctx, ids)
 }

@@ -11,18 +11,20 @@ import (
 )
 
 type Servers struct {
-	Auth       auth.AuthServiceServer
-	Profile    profile.ProfileServiceServer
-	Friendship friendship.FriendshipServiceServer
+	Auth              auth.AuthServiceServer
+	Profile           profile.ProfileServiceServer
+	Friendship        friendship.FriendshipServiceServer
+	FriendshipRequest friendship.RequestServiceServer
 }
 
 func ProvideServers(services *provider.Services) *Servers {
 	validate := validator.New()
 
 	return &Servers{
-		Auth:       NewAuthServer(validate, services.Auth, services.OAuth),
-		Profile:    NewProfileServer(validate, services.Profile),
-		Friendship: NewFriendshipServer(validate, services.Friendship),
+		Auth:              newAuthServer(validate, services.Auth, services.OAuth),
+		Profile:           newProfileServer(validate, services.Profile),
+		Friendship:        newFriendshipServer(validate, services.Friendship),
+		FriendshipRequest: newFriendshipRequestServer(services.FriendshipRequest),
 	}
 }
 
@@ -36,10 +38,14 @@ func (s *Servers) Register(grpcServer *grpc.Server) error {
 	if s.Friendship == nil {
 		return eris.New("Friendship server is nil")
 	}
+	if s.FriendshipRequest == nil {
+		return eris.New("FriendshipRequest server is nil")
+	}
 
 	auth.RegisterAuthServiceServer(grpcServer, s.Auth)
 	profile.RegisterProfileServiceServer(grpcServer, s.Profile)
 	friendship.RegisterFriendshipServiceServer(grpcServer, s.Friendship)
+	friendship.RegisterRequestServiceServer(grpcServer, s.FriendshipRequest)
 
 	return nil
 }

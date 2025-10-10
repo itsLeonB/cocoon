@@ -1,17 +1,21 @@
 package provider
 
 import (
+	"net/http"
+
 	"github.com/itsLeonB/cocoon/internal/config"
 	"github.com/itsLeonB/cocoon/internal/service"
 	"github.com/itsLeonB/cocoon/internal/store"
 	"github.com/itsLeonB/ezutil/v2"
+	"github.com/rotisserie/eris"
 )
 
 type Services struct {
-	Auth       service.AuthService
-	OAuth      service.OAuthService
-	Profile    service.ProfileService
-	Friendship service.FriendshipService
+	Auth              service.AuthService
+	OAuth             service.OAuthService
+	Profile           service.ProfileService
+	Friendship        service.FriendshipService
+	FriendshipRequest service.FriendshipRequestService
 }
 
 func ProvideServices(
@@ -19,7 +23,12 @@ func ProvideServices(
 	repos *Repositories,
 	logger ezutil.Logger,
 	store store.StateStore,
+	httpClient *http.Client,
 ) (*Services, error) {
+	if httpClient == nil {
+		return nil, eris.New("httpClient cannot be nil")
+	}
+
 	profileService := service.NewProfileService(
 		repos.Transactor,
 		repos.UserProfile,
@@ -49,6 +58,7 @@ func ProvideServices(
 		configs,
 		store,
 		userSvc,
+		httpClient,
 	)
 
 	friendshipService := service.NewFriendshipService(
@@ -57,10 +67,18 @@ func ProvideServices(
 		profileService,
 	)
 
+	friendshipReqSvc := service.NewFriendshipRequestService(
+		repos.Transactor,
+		friendshipService,
+		profileService,
+		repos.FriendshipRequest,
+	)
+
 	return &Services{
-		Auth:       authService,
-		OAuth:      oAuthSvc,
-		Profile:    profileService,
-		Friendship: friendshipService,
+		Auth:              authService,
+		OAuth:             oAuthSvc,
+		Profile:           profileService,
+		Friendship:        friendshipService,
+		FriendshipRequest: friendshipReqSvc,
 	}, nil
 }
