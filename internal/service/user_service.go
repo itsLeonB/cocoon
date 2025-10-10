@@ -58,14 +58,16 @@ func (us *userServiceImpl) CreateNew(ctx context.Context, request dto.NewUserReq
 			return err
 		}
 
-		profile := dto.NewProfileRequest{
-			UserID: user.ID,
-			Name:   request.Name,
-			Avatar: request.Avatar,
-		}
+		if request.VerifyNow {
+			profile := dto.NewProfileRequest{
+				UserID: user.ID,
+				Name:   request.Name,
+				Avatar: request.Avatar,
+			}
 
-		if _, err = us.profileSvc.Create(ctx, profile); err != nil {
-			return err
+			if _, err = us.profileSvc.Create(ctx, profile); err != nil {
+				return err
+			}
 		}
 
 		response = user
@@ -91,13 +93,23 @@ func (us *userServiceImpl) FindByEmail(ctx context.Context, email string) (entit
 	return us.userRepo.FindFirst(ctx, userSpec)
 }
 
-func (us *userServiceImpl) Verify(ctx context.Context, id uuid.UUID, email string) (entity.User, error) {
+func (us *userServiceImpl) Verify(ctx context.Context, id uuid.UUID, email string, name string, avatar string) (entity.User, error) {
 	user, err := us.getByID(ctx, id)
 	if err != nil {
 		return entity.User{}, err
 	}
 	if user.Email != email {
 		return entity.User{}, eris.New("email does not match")
+	}
+
+	profile := dto.NewProfileRequest{
+		UserID: user.ID,
+		Name:   name,
+		Avatar: avatar,
+	}
+
+	if _, err = us.profileSvc.Create(ctx, profile); err != nil {
+		return entity.User{}, err
 	}
 
 	user.VerifiedAt = sql.NullTime{

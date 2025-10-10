@@ -105,7 +105,7 @@ func (as *authServiceImpl) VerifyRegistration(ctx context.Context, token string)
 			return ungerr.UnauthorizedError("token has expired")
 		}
 
-		user, err := as.userSvc.Verify(ctx, userID, email)
+		user, err := as.userSvc.Verify(ctx, userID, email, util.GetNameFromEmail(email), "")
 		if err != nil {
 			return err
 		}

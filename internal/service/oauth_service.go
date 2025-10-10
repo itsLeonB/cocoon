@@ -95,7 +95,7 @@ func (as *oauthServiceImpl) HandleOAuthCallback(ctx context.Context, data dto.OA
 		}
 
 		if !user.IsVerified() {
-			if _, err = as.userSvc.Verify(ctx, user.ID, user.Email); err != nil {
+			if _, err = as.userSvc.Verify(ctx, user.ID, user.Email, userInfo.Name, userInfo.Avatar); err != nil {
 				return err
 			}
 		}

@@ -35,7 +35,7 @@ func NewFriendshipRequestService(
 	}
 }
 
-func (fs *friendshipRequestServiceImpl) Send(ctx context.Context, userProfileID, friendProfileID uuid.UUID, message string) error {
+func (fs *friendshipRequestServiceImpl) Send(ctx context.Context, userProfileID, friendProfileID uuid.UUID) error {
 	return fs.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
 		spec := crud.Specification[entity.FriendshipRequest]{}
 		spec.Model.SenderProfileID = userProfileID
@@ -70,10 +70,6 @@ func (fs *friendshipRequestServiceImpl) Send(ctx context.Context, userProfileID,
 		newRequest := entity.FriendshipRequest{
 			SenderProfileID:    userProfileID,
 			RecipientProfileID: friendProfileID,
-			Message: sql.NullString{
-				String: message,
-				Valid:  message != "",
-			},
 		}
 
 		_, err = fs.requestRepo.Insert(ctx, newRequest)
@@ -84,7 +80,7 @@ func (fs *friendshipRequestServiceImpl) Send(ctx context.Context, userProfileID,
 func (fs *friendshipRequestServiceImpl) GetAllSent(ctx context.Context, userProfileID uuid.UUID) ([]dto.FriendshipRequestResponse, error) {
 	spec := crud.Specification[entity.FriendshipRequest]{}
 	spec.Model.SenderProfileID = userProfileID
-	spec.PreloadRelations = []string{"RecipientProfile"}
+	spec.PreloadRelations = []string{"SenderProfile", "RecipientProfile"}
 	requests, err := fs.requestRepo.FindAll(ctx, spec)
 	if err != nil {
 		return nil, err
@@ -110,7 +106,7 @@ func (fs *friendshipRequestServiceImpl) Cancel(ctx context.Context, userProfileI
 func (fs *friendshipRequestServiceImpl) GetAllReceived(ctx context.Context, userProfileID uuid.UUID) ([]dto.FriendshipRequestResponse, error) {
 	spec := crud.Specification[entity.FriendshipRequest]{}
 	spec.Model.RecipientProfileID = userProfileID
-	spec.PreloadRelations = []string{"SenderProfile"}
+	spec.PreloadRelations = []string{"SenderProfile", "RecipientProfile"}
 	requests, err := fs.requestRepo.FindAll(ctx, spec)
 	if err != nil {
 		return nil, err

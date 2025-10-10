@@ -10,7 +10,6 @@ func FriendshipRequestToResponse(fr entity.FriendshipRequest) dto.FriendshipRequ
 		ID:        fr.ID,
 		Sender:    ProfileToResponse(fr.SenderProfile, ""),
 		Recipient: ProfileToResponse(fr.RecipientProfile, ""),
-		Message:   fr.Message.String,
 		CreatedAt: fr.CreatedAt,
 		BlockedAt: fr.BlockedAt.Time,
 	}

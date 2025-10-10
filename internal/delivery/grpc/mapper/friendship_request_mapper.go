@@ -11,7 +11,6 @@ func ToFriendshipRequestProto(fr dto.FriendshipRequestResponse) *friendship.Requ
 		Id:        fr.ID.String(),
 		Sender:    ToProfileResponseProto(fr.Sender),
 		Recipient: ToProfileResponseProto(fr.Recipient),
-		Message:   fr.Message,
 		CreatedAt: gerpc.NullableTimeToProto(fr.CreatedAt),
 		BlockedAt: gerpc.NullableTimeToProto(fr.BlockedAt),
 	}

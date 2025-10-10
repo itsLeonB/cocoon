@@ -16,13 +16,14 @@ func ToFriendshipProto(res dto.FriendshipResponse) (*friendship.FriendshipRespon
 	}
 
 	return &friendship.FriendshipResponse{
-		Id:          res.ID.String(),
-		Type:        friendshipType,
-		ProfileId:   res.ProfileID.String(),
-		ProfileName: res.ProfileName,
-		CreatedAt:   timestamppb.New(res.CreatedAt),
-		UpdatedAt:   timestamppb.New(res.UpdatedAt),
-		DeletedAt:   gerpc.NullableTimeToProto(res.DeletedAt),
+		Id:            res.ID.String(),
+		Type:          friendshipType,
+		ProfileId:     res.ProfileID.String(),
+		ProfileName:   res.ProfileName,
+		ProfileAvatar: res.ProfileAvatar,
+		CreatedAt:     timestamppb.New(res.CreatedAt),
+		UpdatedAt:     timestamppb.New(res.UpdatedAt),
+		DeletedAt:     gerpc.NullableTimeToProto(res.DeletedAt),
 	}, nil
 }
 

@@ -26,7 +26,7 @@ type UserService interface {
 	CreateNew(ctx context.Context, request dto.NewUserRequest) (entity.User, error)
 	GetByID(ctx context.Context, id uuid.UUID) (dto.UserResponse, error)
 	FindByEmail(ctx context.Context, email string) (entity.User, error)
-	Verify(ctx context.Context, id uuid.UUID, email string) (entity.User, error)
+	Verify(ctx context.Context, id uuid.UUID, email string, name string, avatar string) (entity.User, error)
 	GeneratePasswordResetToken(ctx context.Context, userID uuid.UUID) (string, error)
 	ResetPassword(ctx context.Context, userID uuid.UUID, email, resetToken, password string) (entity.User, error)
 }
@@ -49,7 +49,7 @@ type FriendshipService interface {
 }
 
 type FriendshipRequestService interface {
-	Send(ctx context.Context, userProfileID, friendProfileID uuid.UUID, message string) error
+	Send(ctx context.Context, userProfileID, friendProfileID uuid.UUID) error
 	GetAllSent(ctx context.Context, userProfileID uuid.UUID) ([]dto.FriendshipRequestResponse, error)
 	Cancel(ctx context.Context, userProfileID, reqID uuid.UUID) error
 	GetAllReceived(ctx context.Context, userProfileID uuid.UUID) ([]dto.FriendshipRequestResponse, error)

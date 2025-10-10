@@ -36,7 +36,7 @@ func (frs *friendshipRequestServer) Send(ctx context.Context, req *friendship.Se
 	if err != nil {
 		return nil, err
 	}
-	return nil, frs.svc.Send(ctx, userProfileID, friendProfileID, req.GetMessage())
+	return nil, frs.svc.Send(ctx, userProfileID, friendProfileID)
 }
 
 func (frs *friendshipRequestServer) GetAllSent(ctx context.Context, req *friendship.GetAllSentRequest) (*friendship.GetAllSentResponse, error) {

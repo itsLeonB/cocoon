@@ -11,7 +11,6 @@ type FriendshipRequest struct {
 	crud.BaseEntity
 	SenderProfileID    uuid.UUID
 	RecipientProfileID uuid.UUID
-	Message            sql.NullString
 	BlockedAt          sql.NullTime
 	SenderProfile      UserProfile
 	RecipientProfile   UserProfile

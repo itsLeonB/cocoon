@@ -38,10 +38,14 @@ func (s *Servers) Register(grpcServer *grpc.Server) error {
 	if s.Friendship == nil {
 		return eris.New("Friendship server is nil")
 	}
+	if s.FriendshipRequest == nil {
+		return eris.New("FriendshipRequest server is nil")
+	}
 
 	auth.RegisterAuthServiceServer(grpcServer, s.Auth)
 	profile.RegisterProfileServiceServer(grpcServer, s.Profile)
 	friendship.RegisterFriendshipServiceServer(grpcServer, s.Friendship)
+	friendship.RegisterRequestServiceServer(grpcServer, s.FriendshipRequest)
 
 	return nil
 }
