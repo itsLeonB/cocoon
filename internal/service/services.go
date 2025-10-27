@@ -38,6 +38,7 @@ type ProfileService interface {
 	Update(ctx context.Context, req dto.UpdateProfileRequest) (dto.ProfileResponse, error)
 	GetByEmail(ctx context.Context, email string) (dto.ProfileResponse, error)
 	SearchByName(ctx context.Context, query string, limit int) ([]dto.ProfileResponse, error)
+	Delete(ctx context.Context, id uuid.UUID) error
 }
 
 type FriendshipService interface {
@@ -46,6 +47,7 @@ type FriendshipService interface {
 	GetDetails(ctx context.Context, profileID, friendshipID uuid.UUID) (dto.FriendDetails, error)
 	IsFriends(ctx context.Context, profileID1, profileID2 uuid.UUID) (bool, bool, error)
 	CreateReal(ctx context.Context, userProfileID, friendProfileID uuid.UUID) (dto.FriendshipResponse, error)
+	RemoveAnonymous(ctx context.Context, userProfileID, friendProfileID uuid.UUID) error
 }
 
 type FriendshipRequestService interface {

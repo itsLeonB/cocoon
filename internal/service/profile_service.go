@@ -60,17 +60,9 @@ func (ps *profileServiceImpl) Create(ctx context.Context, request dto.NewProfile
 }
 
 func (ps *profileServiceImpl) GetByID(ctx context.Context, id uuid.UUID) (dto.ProfileResponse, error) {
-	spec := crud.Specification[entity.UserProfile]{}
-	spec.Model.ID = id
-	profile, err := ps.profileRepo.FindFirst(ctx, spec)
+	profile, err := ps.getByID(ctx, id)
 	if err != nil {
 		return dto.ProfileResponse{}, err
-	}
-	if profile.IsZero() {
-		return dto.ProfileResponse{}, ungerr.NotFoundError(fmt.Sprintf("profile with ID: %s is not found", id))
-	}
-	if profile.IsDeleted() {
-		return dto.ProfileResponse{}, ungerr.ConflictError(fmt.Sprintf("profile with ID: %s is already deleted", id))
 	}
 
 	userSpec := crud.Specification[entity.User]{}
@@ -160,4 +152,31 @@ func (ps *profileServiceImpl) SearchByName(ctx context.Context, query string, li
 
 	ids := ezutil.MapSlice(profileNames, func(pn entity.ProfileName) uuid.UUID { return pn.ID })
 	return ps.GetByIDs(ctx, ids)
+}
+
+func (ps *profileServiceImpl) Delete(ctx context.Context, id uuid.UUID) error {
+	return ps.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
+		profile, err := ps.getByID(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		return ps.profileRepo.Delete(ctx, profile)
+	})
+}
+
+func (ps *profileServiceImpl) getByID(ctx context.Context, id uuid.UUID) (entity.UserProfile, error) {
+	spec := crud.Specification[entity.UserProfile]{}
+	spec.Model.ID = id
+	profile, err := ps.profileRepo.FindFirst(ctx, spec)
+	if err != nil {
+		return entity.UserProfile{}, err
+	}
+	if profile.IsZero() {
+		return entity.UserProfile{}, ungerr.NotFoundError(fmt.Sprintf("profile with ID: %s is not found", id))
+	}
+	if profile.IsDeleted() {
+		return entity.UserProfile{}, ungerr.ConflictError(fmt.Sprintf("profile with ID: %s is already deleted", id))
+	}
+	return profile, nil
 }

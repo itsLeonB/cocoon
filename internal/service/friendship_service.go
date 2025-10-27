@@ -156,6 +156,32 @@ func (fs *friendshipServiceImpl) CreateReal(ctx context.Context, userProfileID, 
 	return response, err
 }
 
+func (fs *friendshipServiceImpl) RemoveAnonymous(ctx context.Context, userProfileID, friendProfileID uuid.UUID) error {
+	return fs.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
+		friendProfile, err := fs.profileService.GetByID(ctx, friendProfileID)
+		if err != nil {
+			return err
+		}
+		if friendProfile.UserID != uuid.Nil {
+			return ungerr.UnprocessableEntityError("cannot remove friend, is not anonymous")
+		}
+
+		friendship, err := fs.friendshipRepository.FindByProfileIDs(ctx, userProfileID, friendProfileID)
+		if err != nil {
+			return err
+		}
+		if friendship.IsZero() || friendship.IsDeleted() {
+			return nil
+		}
+
+		if err = fs.friendshipRepository.Delete(ctx, friendship); err != nil {
+			return err
+		}
+
+		return fs.profileService.Delete(ctx, friendProfileID)
+	})
+}
+
 func (fs *friendshipServiceImpl) validateExistingAnonymousFriendship(
 	ctx context.Context,
 	userProfileID uuid.UUID,

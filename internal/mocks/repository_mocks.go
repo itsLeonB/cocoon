@@ -162,6 +162,21 @@ func (mr *MockUserProfileRepositoryMockRecorder) InsertMany(ctx, models any) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertMany", reflect.TypeOf((*MockUserProfileRepository)(nil).InsertMany), ctx, models)
 }
 
+// SaveMany mocks base method.
+func (m *MockUserProfileRepository) SaveMany(ctx context.Context, models []entity.UserProfile) ([]entity.UserProfile, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveMany", ctx, models)
+	ret0, _ := ret[0].([]entity.UserProfile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SaveMany indicates an expected call of SaveMany.
+func (mr *MockUserProfileRepositoryMockRecorder) SaveMany(ctx, models any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveMany", reflect.TypeOf((*MockUserProfileRepository)(nil).SaveMany), ctx, models)
+}
+
 // SearchByName mocks base method.
 func (m *MockUserProfileRepository) SearchByName(ctx context.Context, query string, limit int) ([]entity.ProfileName, error) {
 	m.ctrl.T.Helper()
@@ -362,6 +377,21 @@ func (m *MockFriendshipRepository) InsertMany(ctx context.Context, models []enti
 func (mr *MockFriendshipRepositoryMockRecorder) InsertMany(ctx, models any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertMany", reflect.TypeOf((*MockFriendshipRepository)(nil).InsertMany), ctx, models)
+}
+
+// SaveMany mocks base method.
+func (m *MockFriendshipRepository) SaveMany(ctx context.Context, models []entity.Friendship) ([]entity.Friendship, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveMany", ctx, models)
+	ret0, _ := ret[0].([]entity.Friendship)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SaveMany indicates an expected call of SaveMany.
+func (mr *MockFriendshipRepositoryMockRecorder) SaveMany(ctx, models any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveMany", reflect.TypeOf((*MockFriendshipRepository)(nil).SaveMany), ctx, models)
 }
 
 // Update mocks base method.

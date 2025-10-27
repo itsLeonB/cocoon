@@ -11,6 +11,8 @@ import (
 	"github.com/itsLeonB/cocoon/internal/service"
 	"github.com/itsLeonB/ezutil/v2"
 	"github.com/itsLeonB/gerpc"
+	"github.com/rotisserie/eris"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -136,4 +138,22 @@ func (fs *friendshipServer) IsFriends(ctx context.Context, req *friendship.IsFri
 		IsFriends:   isFriends,
 		IsAnonymous: isAnonymous,
 	}, nil
+}
+
+func (fs *friendshipServer) RemoveAnonymous(ctx context.Context, req *friendship.RemoveAnonymousRequest) (*emptypb.Empty, error) {
+	if req == nil {
+		return nil, eris.New("request is nil")
+	}
+
+	userProfileID, err := ezutil.Parse[uuid.UUID](req.GetUserProfileId())
+	if err != nil {
+		return nil, err
+	}
+
+	friendProfileID, err := ezutil.Parse[uuid.UUID](req.GetFriendProfileId())
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, fs.friendshipService.RemoveAnonymous(ctx, userProfileID, friendProfileID)
 }

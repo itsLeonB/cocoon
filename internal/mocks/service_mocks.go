@@ -286,18 +286,18 @@ func (mr *MockUserServiceMockRecorder) ResetPassword(ctx, userID, email, resetTo
 }
 
 // Verify mocks base method.
-func (m *MockUserService) Verify(ctx context.Context, id uuid.UUID, email string) (entity.User, error) {
+func (m *MockUserService) Verify(ctx context.Context, id uuid.UUID, email, name, avatar string) (entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Verify", ctx, id, email)
+	ret := m.ctrl.Call(m, "Verify", ctx, id, email, name, avatar)
 	ret0, _ := ret[0].(entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Verify indicates an expected call of Verify.
-func (mr *MockUserServiceMockRecorder) Verify(ctx, id, email any) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) Verify(ctx, id, email, name, avatar any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Verify", reflect.TypeOf((*MockUserService)(nil).Verify), ctx, id, email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Verify", reflect.TypeOf((*MockUserService)(nil).Verify), ctx, id, email, name, avatar)
 }
 
 // MockProfileService is a mock of ProfileService interface.
@@ -337,6 +337,20 @@ func (m *MockProfileService) Create(ctx context.Context, request dto.NewProfileR
 func (mr *MockProfileServiceMockRecorder) Create(ctx, request any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockProfileService)(nil).Create), ctx, request)
+}
+
+// Delete mocks base method.
+func (m *MockProfileService) Delete(ctx context.Context, id uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockProfileServiceMockRecorder) Delete(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockProfileService)(nil).Delete), ctx, id)
 }
 
 // GetByEmail mocks base method.
@@ -514,6 +528,20 @@ func (mr *MockFriendshipServiceMockRecorder) IsFriends(ctx, profileID1, profileI
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsFriends", reflect.TypeOf((*MockFriendshipService)(nil).IsFriends), ctx, profileID1, profileID2)
 }
 
+// RemoveAnonymous mocks base method.
+func (m *MockFriendshipService) RemoveAnonymous(ctx context.Context, userProfileID, friendProfileID uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveAnonymous", ctx, userProfileID, friendProfileID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveAnonymous indicates an expected call of RemoveAnonymous.
+func (mr *MockFriendshipServiceMockRecorder) RemoveAnonymous(ctx, userProfileID, friendProfileID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveAnonymous", reflect.TypeOf((*MockFriendshipService)(nil).RemoveAnonymous), ctx, userProfileID, friendProfileID)
+}
+
 // MockFriendshipRequestService is a mock of FriendshipRequestService interface.
 type MockFriendshipRequestService struct {
 	ctrl     *gomock.Controller
@@ -626,17 +654,17 @@ func (mr *MockFriendshipRequestServiceMockRecorder) Ignore(ctx, userProfileID, r
 }
 
 // Send mocks base method.
-func (m *MockFriendshipRequestService) Send(ctx context.Context, userProfileID, friendProfileID uuid.UUID, message string) error {
+func (m *MockFriendshipRequestService) Send(ctx context.Context, userProfileID, friendProfileID uuid.UUID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Send", ctx, userProfileID, friendProfileID, message)
+	ret := m.ctrl.Call(m, "Send", ctx, userProfileID, friendProfileID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Send indicates an expected call of Send.
-func (mr *MockFriendshipRequestServiceMockRecorder) Send(ctx, userProfileID, friendProfileID, message any) *gomock.Call {
+func (mr *MockFriendshipRequestServiceMockRecorder) Send(ctx, userProfileID, friendProfileID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockFriendshipRequestService)(nil).Send), ctx, userProfileID, friendProfileID, message)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockFriendshipRequestService)(nil).Send), ctx, userProfileID, friendProfileID)
 }
 
 // Unblock mocks base method.
