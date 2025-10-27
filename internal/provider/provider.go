@@ -2,6 +2,7 @@ package provider
 
 import (
 	"errors"
+	"net/http"
 
 	"github.com/itsLeonB/cocoon/internal/config"
 	"github.com/itsLeonB/cocoon/internal/store"
@@ -13,12 +14,18 @@ type Provider struct {
 	*DBs
 	*Repositories
 	*Services
-	Store store.StateStore
+	Store      store.StateStore
+	httpClient *http.Client
 }
 
 func All(logger ezutil.Logger, configs config.Config) (*Provider, error) {
-	dbs := ProvideDBs(configs.DB)
+	dbs, err := ProvideDBs(configs.DB)
+	if err != nil {
+		return nil, err
+	}
+
 	repos := ProvideRepositories(dbs.GormDB)
+	httpClient := configs.NewClient()
 
 	store, err := store.NewStateStore(logger, configs.Valkey)
 	if err != nil {
@@ -28,7 +35,7 @@ func All(logger ezutil.Logger, configs config.Config) (*Provider, error) {
 		return nil, err
 	}
 
-	services, err := ProvideServices(configs, repos, logger, store)
+	services, err := ProvideServices(configs, repos, logger, store, httpClient)
 	if err != nil {
 		if e := dbs.Shutdown(); e != nil {
 			logger.Errorf("error cleaning up DB resources: %v", e)
@@ -45,6 +52,7 @@ func All(logger ezutil.Logger, configs config.Config) (*Provider, error) {
 		Repositories: repos,
 		Services:     services,
 		Store:        store,
+		httpClient:   httpClient,
 	}, nil
 }
 
@@ -59,6 +67,9 @@ func (p *Provider) Shutdown() error {
 		if e := p.Store.Shutdown(); e != nil {
 			err = errors.Join(err, e)
 		}
+	}
+	if p.httpClient != nil {
+		p.httpClient.CloseIdleConnections()
 	}
 	return err
 }

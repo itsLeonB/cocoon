@@ -6,16 +6,17 @@ import (
 	"github.com/google/uuid"
 	"github.com/itsLeonB/cocoon/internal/entity"
 	"github.com/itsLeonB/cocoon/internal/helper"
+	"github.com/itsLeonB/cocoon/internal/util"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSelectProfiles(t *testing.T) {
 	profileID1 := uuid.New()
 	profileID2 := uuid.New()
-	
-	profile1 := entity.UserProfile{UserID: profileID1, Name: "User 1"}
-	profile2 := entity.UserProfile{UserID: profileID2, Name: "User 2"}
-	
+
+	profile1 := entity.UserProfile{UserID: util.NewValidNullUUID(profileID1), Name: "User 1"}
+	profile2 := entity.UserProfile{UserID: util.NewValidNullUUID(profileID2), Name: "User 2"}
+
 	friendship := entity.Friendship{
 		ProfileID1: profileID1,
 		ProfileID2: profileID2,

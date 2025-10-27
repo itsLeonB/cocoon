@@ -9,6 +9,7 @@ import (
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/entity"
 	"github.com/itsLeonB/cocoon/internal/mapper"
+	"github.com/itsLeonB/cocoon/internal/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,9 +19,9 @@ func TestFriendshipToResponse(t *testing.T) {
 	friendshipID := uuid.New()
 	now := time.Now()
 
-	profile1 := entity.UserProfile{UserID: profileID1, Name: "User 1"}
+	profile1 := entity.UserProfile{UserID: util.NewValidNullUUID(profileID1), Name: "User 1"}
 	profile1.ID = profileID1
-	profile2 := entity.UserProfile{UserID: profileID2, Name: "User 2"}
+	profile2 := entity.UserProfile{UserID: util.NewValidNullUUID(profileID2), Name: "User 2"}
 	profile2.ID = profileID2
 
 	friendship := entity.Friendship{
@@ -92,9 +93,9 @@ func TestMapToFriendshipWithProfile(t *testing.T) {
 	profileID1 := uuid.New()
 	profileID2 := uuid.New()
 
-	profile1 := entity.UserProfile{UserID: profileID1, Name: "User 1"}
+	profile1 := entity.UserProfile{UserID: util.NewValidNullUUID(profileID1), Name: "User 1"}
 	profile1.ID = profileID1
-	profile2 := entity.UserProfile{UserID: profileID2, Name: "User 2"}
+	profile2 := entity.UserProfile{UserID: util.NewValidNullUUID(profileID2), Name: "User 2"}
 	profile2.ID = profileID2
 
 	friendship := entity.Friendship{
@@ -120,9 +121,9 @@ func TestMapToFriendDetails(t *testing.T) {
 	friendshipID := uuid.New()
 	now := time.Now()
 
-	profile1 := entity.UserProfile{UserID: profileID1, Name: "User 1"}
+	profile1 := entity.UserProfile{UserID: util.NewValidNullUUID(profileID1), Name: "User 1"}
 	profile1.ID = profileID1
-	profile2 := entity.UserProfile{UserID: profileID2, Name: "User 2"}
+	profile2 := entity.UserProfile{UserID: util.NewValidNullUUID(profileID2), Name: "User 2"}
 	profile2.ID = profileID2
 
 	friendship := entity.Friendship{

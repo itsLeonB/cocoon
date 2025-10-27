@@ -8,7 +8,7 @@ const (
 	ErrAuthDuplicateUser      = "user with email %s is already registered"
 	ErrAuthUnknownCredentials = "unknown credentials, please check your email/password"
 
-	ErrUserNotFound = "user with ID: %s is not found"
+	ErrUserNotFound = "user is not found"
 	ErrUserDeleted  = "user with ID: %s is deleted"
 
 	ErrFriendshipNotFound = "friendship not found"

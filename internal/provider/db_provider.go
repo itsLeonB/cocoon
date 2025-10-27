@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/itsLeonB/cocoon/internal/config"
+	"github.com/rotisserie/eris"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -13,11 +14,12 @@ type DBs struct {
 	GormDB   *gorm.DB
 }
 
-func ProvideDBs(dbConfig config.DB) *DBs {
+func ProvideDBs(dbConfig config.DB) (*DBs, error) {
 	dbs := &DBs{dbConfig, nil}
-	dbs.openGormConnection()
-
-	return dbs
+	if err := dbs.openGormConnection(); err != nil {
+		return nil, err
+	}
+	return dbs, nil
 }
 
 func (d *DBs) Shutdown() error {
@@ -65,11 +67,21 @@ func (d *DBs) getGormDialector() gorm.Dialector {
 	}
 }
 
-func (d *DBs) openGormConnection() {
+func (d *DBs) openGormConnection() error {
 	db, err := gorm.Open(d.getGormDialector(), &gorm.Config{})
 	if err != nil {
-		panic(fmt.Sprintf("error opening GORM connection: %s", err.Error()))
+		return eris.Wrap(err, "error opening gorm connection")
 	}
 
+	sqlDB, err := db.DB()
+	if err != nil {
+		return eris.Wrap(err, "error returning sql DB")
+	}
+
+	sqlDB.SetMaxOpenConns(d.dbConfig.MaxOpenConns)
+	sqlDB.SetMaxIdleConns(d.dbConfig.MaxIdleConns)
+	sqlDB.SetConnMaxLifetime(d.dbConfig.ConnMaxLifetime)
+
 	d.GormDB = db
+	return nil
 }
