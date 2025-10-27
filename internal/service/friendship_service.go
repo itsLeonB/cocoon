@@ -173,6 +173,9 @@ func (fs *friendshipServiceImpl) RemoveAnonymous(ctx context.Context, userProfil
 		if friendship.IsZero() || friendship.IsDeleted() {
 			return nil
 		}
+		if friendship.Type != appconstant.Anonymous {
+			return ungerr.UnprocessableEntityError("cannot remove friend, is not anonymous")
+		}
 
 		if err = fs.friendshipRepository.Delete(ctx, friendship); err != nil {
 			return err

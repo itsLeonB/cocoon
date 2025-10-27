@@ -46,7 +46,7 @@ func (fs *friendshipRequestServiceImpl) Send(ctx context.Context, userProfileID,
 		}
 		if !existingRequest.IsZero() {
 			if existingRequest.BlockedAt.Valid {
-				return ungerr.UnprocessableEntityError("user are blocked by recipient")
+				return ungerr.UnprocessableEntityError("user is blocked by recipient")
 			}
 			return ungerr.UnprocessableEntityError("user still has existing request")
 		}

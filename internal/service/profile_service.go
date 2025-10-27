@@ -151,7 +151,25 @@ func (ps *profileServiceImpl) SearchByName(ctx context.Context, query string, li
 	}
 
 	ids := ezutil.MapSlice(profileNames, func(pn entity.ProfileName) uuid.UUID { return pn.ID })
-	return ps.GetByIDs(ctx, ids)
+
+	profiles, err := ps.GetByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	profileByID := make(map[uuid.UUID]dto.ProfileResponse, len(profiles))
+	for _, profile := range profiles {
+		profileByID[profile.ID] = profile
+	}
+
+	ordered := make([]dto.ProfileResponse, 0, len(profileNames))
+	for _, pn := range profileNames {
+		if profile, ok := profileByID[pn.ID]; ok {
+			ordered = append(ordered, profile)
+		}
+	}
+
+	return ordered, nil
 }
 
 func (ps *profileServiceImpl) Delete(ctx context.Context, id uuid.UUID) error {
