@@ -16,20 +16,26 @@ import (
 )
 
 type profileServiceImpl struct {
-	transactor  crud.Transactor
-	profileRepo repository.UserProfileRepository
-	userRepo    crud.Repository[entity.User]
+	transactor         crud.Transactor
+	profileRepo        repository.UserProfileRepository
+	userRepo           crud.Repository[entity.User]
+	friendshipRepo     repository.FriendshipRepository
+	relatedProfileRepo crud.Repository[entity.RelatedProfile]
 }
 
 func NewProfileService(
 	transactor crud.Transactor,
 	profileRepo repository.UserProfileRepository,
 	userRepo crud.Repository[entity.User],
+	friendshipRepo repository.FriendshipRepository,
+	relatedProfileRepo crud.Repository[entity.RelatedProfile],
 ) ProfileService {
 	return &profileServiceImpl{
 		transactor,
 		profileRepo,
 		userRepo,
+		friendshipRepo,
+		relatedProfileRepo,
 	}
 }
 
@@ -197,4 +203,65 @@ func (ps *profileServiceImpl) getByID(ctx context.Context, id uuid.UUID) (entity
 		return entity.UserProfile{}, ungerr.ConflictError(fmt.Sprintf("profile with ID: %s is already deleted", id))
 	}
 	return profile, nil
+}
+
+func (ps *profileServiceImpl) Associate(ctx context.Context, request dto.AssociateProfileRequest) error {
+	return ps.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
+		if request.RealProfileID == uuid.Nil || request.AnonProfileID == uuid.Nil {
+			return ungerr.BadRequestError("realProfileID and anonProfileID cannot be nil")
+		}
+
+		if _, err := ps.getByID(ctx, request.RealProfileID); err != nil {
+			return err
+		}
+		if _, err := ps.getByID(ctx, request.AnonProfileID); err != nil {
+			return err
+		}
+
+		if err := ps.validateAssociation(ctx, request); err != nil {
+			return err
+		}
+
+		return ps.createAssociation(ctx, request)
+	})
+}
+
+func (ps *profileServiceImpl) validateAssociation(ctx context.Context, request dto.AssociateProfileRequest) error {
+	relatedSpec := crud.Specification[entity.RelatedProfile]{}
+	relatedSpec.Model.AnonProfileID = request.AnonProfileID
+	existingRelated, err := ps.relatedProfileRepo.FindFirst(ctx, relatedSpec)
+	if err != nil {
+		return err
+	}
+	if !existingRelated.IsZero() {
+		return ungerr.ConflictError("anonProfileID is already associated with a real profile")
+	}
+
+	if err := ps.checkFriendship(ctx, request.UserProfileID, request.RealProfileID, "real"); err != nil {
+		return err
+	}
+	if err := ps.checkFriendship(ctx, request.UserProfileID, request.AnonProfileID, "anonymous"); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ps *profileServiceImpl) checkFriendship(ctx context.Context, userProfileID, friendProfileID uuid.UUID, typeStr string) error {
+	f, err := ps.friendshipRepo.FindByProfileIDs(ctx, userProfileID, friendProfileID)
+	if err != nil {
+		return err
+	}
+	if f.IsZero() || f.IsDeleted() {
+		return ungerr.ForbiddenError(fmt.Sprintf("user is not friends with the %s profile", typeStr))
+	}
+	return nil
+}
+
+func (ps *profileServiceImpl) createAssociation(ctx context.Context, request dto.AssociateProfileRequest) error {
+	newRelated := entity.RelatedProfile{
+		RealProfileID: request.RealProfileID,
+		AnonProfileID: request.AnonProfileID,
+	}
+	_, err := ps.relatedProfileRepo.Insert(ctx, newRelated)
+	return err
 }

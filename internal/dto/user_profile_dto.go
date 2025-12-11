@@ -29,3 +29,9 @@ type UpdateProfileRequest struct {
 	Name   string
 	Avatar string
 }
+
+type AssociateProfileRequest struct {
+	UserProfileID uuid.UUID
+	RealProfileID uuid.UUID
+	AnonProfileID uuid.UUID
+}

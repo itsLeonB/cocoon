@@ -324,6 +324,20 @@ func (m *MockProfileService) EXPECT() *MockProfileServiceMockRecorder {
 	return m.recorder
 }
 
+// Associate mocks base method.
+func (m *MockProfileService) Associate(ctx context.Context, request dto.AssociateProfileRequest) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Associate", ctx, request)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Associate indicates an expected call of Associate.
+func (mr *MockProfileServiceMockRecorder) Associate(ctx, request any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Associate", reflect.TypeOf((*MockProfileService)(nil).Associate), ctx, request)
+}
+
 // Create mocks base method.
 func (m *MockProfileService) Create(ctx context.Context, request dto.NewProfileRequest) (dto.ProfileResponse, error) {
 	m.ctrl.T.Helper()

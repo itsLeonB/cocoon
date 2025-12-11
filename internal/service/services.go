@@ -39,6 +39,7 @@ type ProfileService interface {
 	GetByEmail(ctx context.Context, email string) (dto.ProfileResponse, error)
 	SearchByName(ctx context.Context, query string, limit int) ([]dto.ProfileResponse, error)
 	Delete(ctx context.Context, id uuid.UUID) error
+	Associate(ctx context.Context, request dto.AssociateProfileRequest) error
 }
 
 type FriendshipService interface {

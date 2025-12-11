@@ -11,6 +11,7 @@ import (
 	"github.com/itsLeonB/cocoon/internal/service"
 	"github.com/itsLeonB/ezutil/v2"
 	"github.com/itsLeonB/ungerr"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type profileServer struct {
@@ -146,4 +147,30 @@ func (ps *profileServer) SearchByName(ctx context.Context, req *profile.SearchBy
 	return &profile.SearchByNameResponse{
 		Profiles: ezutil.MapSlice(responses, mapper.ToProfileResponseProto),
 	}, nil
+}
+
+func (ps *profileServer) Associate(ctx context.Context, req *profile.AssociateRequest) (*emptypb.Empty, error) {
+	if req == nil {
+		return nil, ungerr.BadRequestError("request is nil")
+	}
+	userProfileID, err := ezutil.Parse[uuid.UUID](req.GetUserProfileId())
+	if err != nil {
+		return nil, err
+	}
+	realProfileID, err := ezutil.Parse[uuid.UUID](req.GetRealProfileId())
+	if err != nil {
+		return nil, err
+	}
+	anonProfileID, err := ezutil.Parse[uuid.UUID](req.GetAnonProfileId())
+	if err != nil {
+		return nil, err
+	}
+
+	request := dto.AssociateProfileRequest{
+		UserProfileID: userProfileID,
+		RealProfileID: realProfileID,
+		AnonProfileID: anonProfileID,
+	}
+
+	return nil, ps.profileService.Associate(ctx, request)
 }

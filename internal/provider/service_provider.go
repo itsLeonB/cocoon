@@ -33,6 +33,8 @@ func ProvideServices(
 		repos.Transactor,
 		repos.UserProfile,
 		repos.User,
+		repos.Friendship,
+		repos.RelatedProfile,
 	)
 
 	userSvc := service.NewUserService(
