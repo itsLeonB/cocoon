@@ -57,7 +57,7 @@ func (ps *profileServiceImpl) Create(ctx context.Context, request dto.NewProfile
 			return err
 		}
 
-		response = mapper.ProfileToResponse(insertedProfile, "")
+		response = mapper.ProfileToResponse(insertedProfile, "", nil, uuid.Nil)
 
 		return nil
 	})
@@ -78,7 +78,12 @@ func (ps *profileServiceImpl) GetByID(ctx context.Context, id uuid.UUID) (dto.Pr
 		return dto.ProfileResponse{}, err
 	}
 
-	return mapper.ProfileToResponse(profile, user.Email), nil
+	anonProfileIDs, realProfileID, err := ps.getAssociations(ctx, profile)
+	if err != nil {
+		return dto.ProfileResponse{}, err
+	}
+
+	return mapper.ProfileToResponse(profile, user.Email, anonProfileIDs, realProfileID), nil
 }
 
 func (ps *profileServiceImpl) GetByIDs(ctx context.Context, ids []uuid.UUID) ([]dto.ProfileResponse, error) {
@@ -126,7 +131,7 @@ func (ps *profileServiceImpl) Update(ctx context.Context, req dto.UpdateProfileR
 			return err
 		}
 
-		response = mapper.ProfileToResponse(updatedProfile, "")
+		response = mapper.ProfileToResponse(updatedProfile, "", nil, uuid.Nil)
 		return nil
 	})
 	return response, err
@@ -144,7 +149,13 @@ func (ps *profileServiceImpl) GetByEmail(ctx context.Context, email string) (dto
 	if user.IsZero() || user.IsDeleted() || !user.IsVerified() {
 		return dto.ProfileResponse{}, ungerr.NotFoundError(appconstant.ErrUserNotFound)
 	}
-	return mapper.ProfileToResponse(user.Profile, user.Email), nil
+
+	anonProfileIDs, realProfileID, err := ps.getAssociations(ctx, user.Profile)
+	if err != nil {
+		return dto.ProfileResponse{}, err
+	}
+
+	return mapper.ProfileToResponse(user.Profile, user.Email, anonProfileIDs, realProfileID), nil
 }
 
 func (ps *profileServiceImpl) SearchByName(ctx context.Context, query string, limit int) ([]dto.ProfileResponse, error) {
@@ -264,4 +275,37 @@ func (ps *profileServiceImpl) createAssociation(ctx context.Context, request dto
 	}
 	_, err := ps.relatedProfileRepo.Insert(ctx, newRelated)
 	return err
+}
+
+func (ps *profileServiceImpl) getAssociatedProfileIDs(ctx context.Context, realProfileID uuid.UUID) ([]uuid.UUID, error) {
+	spec := crud.Specification[entity.RelatedProfile]{}
+	spec.Model.RealProfileID = realProfileID
+	relations, err := ps.relatedProfileRepo.FindAll(ctx, spec)
+	if err != nil {
+		return nil, err
+	}
+	return ezutil.MapSlice(relations, func(r entity.RelatedProfile) uuid.UUID { return r.AnonProfileID }), nil
+}
+
+func (ps *profileServiceImpl) GetRealProfileID(ctx context.Context, anonProfileID uuid.UUID) (uuid.UUID, error) {
+	spec := crud.Specification[entity.RelatedProfile]{}
+	spec.Model.AnonProfileID = anonProfileID
+	relation, err := ps.relatedProfileRepo.FindFirst(ctx, spec)
+	return relation.RealProfileID, err
+}
+
+func (ps *profileServiceImpl) getAssociations(ctx context.Context, profile entity.UserProfile) ([]uuid.UUID, uuid.UUID, error) {
+	if profile.IsReal() {
+		anonProfileIDs, err := ps.getAssociatedProfileIDs(ctx, profile.ID)
+		if err != nil {
+			return nil, uuid.Nil, err
+		}
+		return anonProfileIDs, uuid.Nil, nil
+	} else {
+		profileID, err := ps.GetRealProfileID(ctx, profile.ID)
+		if err != nil {
+			return nil, uuid.Nil, err
+		}
+		return nil, profileID, nil
+	}
 }

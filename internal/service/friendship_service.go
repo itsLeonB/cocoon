@@ -8,6 +8,7 @@ import (
 	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/entity"
+	"github.com/itsLeonB/cocoon/internal/helper"
 	"github.com/itsLeonB/cocoon/internal/mapper"
 	"github.com/itsLeonB/cocoon/internal/repository"
 	"github.com/itsLeonB/ezutil/v2"
@@ -79,11 +80,37 @@ func (fs *friendshipServiceImpl) GetAll(ctx context.Context, profileID uuid.UUID
 		return nil, err
 	}
 
+	validFriendships := make([]entity.Friendship, 0, len(friendships))
+	for _, friendship := range friendships {
+		_, friendProfile, err := helper.SelectProfiles(profileID, friendship)
+		if err != nil {
+			return nil, err
+		}
+
+		if friendProfile.IsReal() {
+			validFriendships = append(validFriendships, friendship)
+			continue
+		}
+
+		// Check if anon profile has a real association
+		realProfileID, err := fs.profileService.GetRealProfileID(ctx, friendProfile.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Skip if there's a real profile (migration case)
+		if realProfileID != uuid.Nil {
+			continue
+		}
+
+		validFriendships = append(validFriendships, friendship)
+	}
+
 	mapperFunc := func(friendship entity.Friendship) (dto.FriendshipResponse, error) {
 		return mapper.FriendshipToResponse(profile.ID, friendship)
 	}
 
-	return ezutil.MapSliceWithError(friendships, mapperFunc)
+	return ezutil.MapSliceWithError(validFriendships, mapperFunc)
 }
 
 func (fs *friendshipServiceImpl) GetDetails(ctx context.Context, profileID, friendshipID uuid.UUID) (dto.FriendDetails, error) {

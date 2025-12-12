@@ -12,6 +12,10 @@ type UserProfile struct {
 	Avatar string
 }
 
+func (up UserProfile) IsReal() bool {
+	return up.UserID.Valid
+}
+
 type ProfileName struct {
 	ID   uuid.UUID
 	Name string

@@ -40,6 +40,7 @@ type ProfileService interface {
 	SearchByName(ctx context.Context, query string, limit int) ([]dto.ProfileResponse, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 	Associate(ctx context.Context, request dto.AssociateProfileRequest) error
+	GetRealProfileID(ctx context.Context, anonProfileID uuid.UUID) (uuid.UUID, error)
 }
 
 type FriendshipService interface {

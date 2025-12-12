@@ -412,6 +412,21 @@ func (mr *MockProfileServiceMockRecorder) GetByIDs(ctx, ids any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByIDs", reflect.TypeOf((*MockProfileService)(nil).GetByIDs), ctx, ids)
 }
 
+// GetRealProfileID mocks base method.
+func (m *MockProfileService) GetRealProfileID(ctx context.Context, anonProfileID uuid.UUID) (uuid.UUID, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRealProfileID", ctx, anonProfileID)
+	ret0, _ := ret[0].(uuid.UUID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRealProfileID indicates an expected call of GetRealProfileID.
+func (mr *MockProfileServiceMockRecorder) GetRealProfileID(ctx, anonProfileID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRealProfileID", reflect.TypeOf((*MockProfileService)(nil).GetRealProfileID), ctx, anonProfileID)
+}
+
 // SearchByName mocks base method.
 func (m *MockProfileService) SearchByName(ctx context.Context, query string, limit int) ([]dto.ProfileResponse, error) {
 	m.ctrl.T.Helper()
