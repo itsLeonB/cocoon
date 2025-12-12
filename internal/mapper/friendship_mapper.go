@@ -16,13 +16,14 @@ func FriendshipToResponse(userProfileID uuid.UUID, friendship entity.Friendship)
 	}
 
 	return dto.FriendshipResponse{
-		ID:          friendship.ID,
-		Type:        friendship.Type,
-		ProfileID:   friendProfile.ID,
-		ProfileName: friendProfile.Name,
-		CreatedAt:   friendship.CreatedAt,
-		UpdatedAt:   friendship.UpdatedAt,
-		DeletedAt:   friendship.DeletedAt.Time,
+		ID:            friendship.ID,
+		Type:          friendship.Type,
+		ProfileID:     friendProfile.ID,
+		ProfileName:   friendProfile.Name,
+		ProfileAvatar: friendProfile.Avatar,
+		CreatedAt:     friendship.CreatedAt,
+		UpdatedAt:     friendship.UpdatedAt,
+		DeletedAt:     friendship.DeletedAt.Time,
 	}, nil
 }
 
@@ -56,8 +57,8 @@ func MapToFriendshipWithProfile(userProfileID uuid.UUID, friendship entity.Frien
 
 	return dto.FriendshipWithProfile{
 		Friendship:    friendshipResponse,
-		UserProfile:   ProfileToResponse(userProfile, ""),
-		FriendProfile: ProfileToResponse(friendProfile, ""),
+		UserProfile:   ProfileToResponse(userProfile, "", nil, uuid.Nil),
+		FriendProfile: ProfileToResponse(friendProfile, "", nil, uuid.Nil),
 	}, nil
 }
 
@@ -73,6 +74,8 @@ func MapToFriendDetails(userProfileID uuid.UUID, friendship entity.Friendship) (
 		ID:         friendship.ID,
 		ProfileID:  friendProfile.ID,
 		Name:       friendProfile.Name,
+		Email:      friendProfile.Email,
+		Avatar:     friendProfile.Avatar,
 		Type:       friendship.Type,
 		CreatedAt:  friendship.CreatedAt,
 		UpdatedAt:  friendship.UpdatedAt,

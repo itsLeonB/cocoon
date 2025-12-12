@@ -1,6 +1,7 @@
 package mapper
 
 import (
+	"github.com/google/uuid"
 	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/entity"
@@ -19,6 +20,6 @@ func UserToResponse(user entity.User) dto.UserResponse {
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 		DeletedAt: user.DeletedAt.Time,
-		Profile:   ProfileToResponse(user.Profile, user.Email),
+		Profile:   ProfileToResponse(user.Profile, user.Email, nil, uuid.Nil),
 	}
 }

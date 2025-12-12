@@ -1,4 +1,4 @@
-TEST_DIR := ./internal/test/...
+TEST_DIR := ./internal/test
 COVER_PKG := ./internal/...
 
 .PHONY: help \
@@ -43,7 +43,7 @@ lint:
 test:
 	@echo "Running all tests..."
 	@if [ -d $(TEST_DIR) ]; then \
-		go test $(TEST_DIR); \
+		go test $(TEST_DIR)/...; \
 	else \
 		echo "No tests found in $(TEST_DIR), skipping."; \
 	fi
@@ -51,7 +51,7 @@ test:
 test-verbose:
 	@echo "Running all tests with verbose output..."
 	@if [ -d $(TEST_DIR) ]; then \
-		go test -v $(TEST_DIR); \
+		go test -v $(TEST_DIR)/...; \
 	else \
 		echo "No tests found in $(TEST_DIR), skipping."; \
 	fi
@@ -59,7 +59,7 @@ test-verbose:
 test-coverage:
 	@echo "Running all tests with coverage report..."
 	@if [ -d $(TEST_DIR) ]; then \
-		go test -v -cover -coverprofile=coverage.out -coverpkg=$(COVER_PKG) $(TEST_DIR); \
+		go test -v -cover -coverprofile=coverage.out -coverpkg=$(COVER_PKG) $(TEST_DIR)/...; \
 	else \
 		echo "No tests found in $(TEST_DIR), skipping."; \
 	fi
@@ -67,7 +67,7 @@ test-coverage:
 test-coverage-html:
 	@echo "Running all tests and generating HTML coverage report..."
 	@if [ -d $(TEST_DIR) ]; then \
-		go test -v -cover -coverprofile=coverage.out -coverpkg=$(COVER_PKG) $(TEST_DIR) && \
+		go test -v -cover -coverprofile=coverage.out -coverpkg=$(COVER_PKG) $(TEST_DIR)/... && \
 		go tool cover -html=coverage.out -o coverage.html && \
 		echo "Coverage report generated: coverage.html"; \
 	else \
@@ -77,7 +77,7 @@ test-coverage-html:
 test-clean:
 	@echo "Cleaning test cache and running tests..."
 	@if [ -d $(TEST_DIR) ]; then \
-		go clean -testcache && go test -v $(TEST_DIR); \
+		go clean -testcache && go test -v $(TEST_DIR)/...; \
 	else \
 		echo "No tests found in $(TEST_DIR), skipping."; \
 	fi

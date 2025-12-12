@@ -19,6 +19,10 @@ func ToProfileResponseProto(res dto.ProfileResponse) *profile.ProfileResponse {
 			Name:   res.Name,
 			Avatar: res.Avatar,
 			Email:  res.Email,
+			AssociatedAnonProfileIds: ezutil.MapSlice(res.AssociatedAnonProfileIDs, func(id uuid.UUID) string {
+				return id.String()
+			}),
+			RealProfileId: res.RealProfileID.String(),
 		},
 		AuditMetadata: &audit.Metadata{
 			Id:        res.ID.String(),

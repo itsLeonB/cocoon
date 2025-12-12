@@ -26,7 +26,7 @@ type UserService interface {
 	CreateNew(ctx context.Context, request dto.NewUserRequest) (entity.User, error)
 	GetByID(ctx context.Context, id uuid.UUID) (dto.UserResponse, error)
 	FindByEmail(ctx context.Context, email string) (entity.User, error)
-	Verify(ctx context.Context, id uuid.UUID, email string) (entity.User, error)
+	Verify(ctx context.Context, id uuid.UUID, email string, name string, avatar string) (entity.User, error)
 	GeneratePasswordResetToken(ctx context.Context, userID uuid.UUID) (string, error)
 	ResetPassword(ctx context.Context, userID uuid.UUID, email, resetToken, password string) (entity.User, error)
 }
@@ -36,6 +36,11 @@ type ProfileService interface {
 	GetByID(ctx context.Context, id uuid.UUID) (dto.ProfileResponse, error)
 	GetByIDs(ctx context.Context, ids []uuid.UUID) ([]dto.ProfileResponse, error)
 	Update(ctx context.Context, req dto.UpdateProfileRequest) (dto.ProfileResponse, error)
+	GetByEmail(ctx context.Context, email string) (dto.ProfileResponse, error)
+	SearchByName(ctx context.Context, query string, limit int) ([]dto.ProfileResponse, error)
+	Delete(ctx context.Context, id uuid.UUID) error
+	Associate(ctx context.Context, request dto.AssociateProfileRequest) error
+	GetRealProfileID(ctx context.Context, anonProfileID uuid.UUID) (uuid.UUID, error)
 }
 
 type FriendshipService interface {
@@ -43,6 +48,19 @@ type FriendshipService interface {
 	GetAll(ctx context.Context, profileID uuid.UUID) ([]dto.FriendshipResponse, error)
 	GetDetails(ctx context.Context, profileID, friendshipID uuid.UUID) (dto.FriendDetails, error)
 	IsFriends(ctx context.Context, profileID1, profileID2 uuid.UUID) (bool, bool, error)
+	CreateReal(ctx context.Context, userProfileID, friendProfileID uuid.UUID) (dto.FriendshipResponse, error)
+	RemoveAnonymous(ctx context.Context, userProfileID, friendProfileID uuid.UUID) error
+}
+
+type FriendshipRequestService interface {
+	Send(ctx context.Context, userProfileID, friendProfileID uuid.UUID) error
+	GetAllSent(ctx context.Context, userProfileID uuid.UUID) ([]dto.FriendshipRequestResponse, error)
+	Cancel(ctx context.Context, userProfileID, reqID uuid.UUID) error
+	GetAllReceived(ctx context.Context, userProfileID uuid.UUID) ([]dto.FriendshipRequestResponse, error)
+	Ignore(ctx context.Context, userProfileID, reqID uuid.UUID) error
+	Block(ctx context.Context, userProfileID, reqID uuid.UUID) error
+	Unblock(ctx context.Context, userProfileID, reqID uuid.UUID) error
+	Accept(ctx context.Context, userProfileID, reqID uuid.UUID) (dto.FriendshipResponse, error)
 }
 
 type MailService interface {

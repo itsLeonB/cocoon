@@ -7,7 +7,16 @@ import (
 
 type UserProfile struct {
 	crud.BaseEntity
-	UserID uuid.UUID
+	UserID uuid.NullUUID
 	Name   string
 	Avatar string
+}
+
+func (up UserProfile) IsReal() bool {
+	return up.UserID.Valid
+}
+
+type ProfileName struct {
+	ID   uuid.UUID
+	Name string
 }

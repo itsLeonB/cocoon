@@ -17,6 +17,7 @@ type Config struct {
 	OAuthProviders
 	Valkey
 	Mail
+	HTTPClient
 }
 
 type App struct {
@@ -65,6 +66,11 @@ func Load() (Config, error) {
 		return Config{}, eris.Wrap(err, errMsg)
 	}
 
+	var http HTTPClient
+	if err = envconfig.Process("HTTP_CLIENT", &http); err != nil {
+		return Config{}, eris.Wrap(err, errMsg)
+	}
+
 	return Config{
 		App:            app,
 		Auth:           auth,
@@ -72,5 +78,6 @@ func Load() (Config, error) {
 		OAuthProviders: oAuthProviders,
 		Valkey:         valkey,
 		Mail:           mail,
+		HTTPClient:     http,
 	}, nil
 }

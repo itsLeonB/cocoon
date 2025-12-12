@@ -8,10 +8,11 @@ import (
 	"github.com/itsLeonB/cocoon/internal/appconstant"
 	"github.com/itsLeonB/cocoon/internal/dto"
 	"github.com/itsLeonB/cocoon/internal/entity"
+	"github.com/itsLeonB/cocoon/internal/helper"
 	"github.com/itsLeonB/cocoon/internal/mapper"
 	"github.com/itsLeonB/cocoon/internal/repository"
 	"github.com/itsLeonB/ezutil/v2"
-	crud "github.com/itsLeonB/go-crud"
+	"github.com/itsLeonB/go-crud"
 	"github.com/itsLeonB/ungerr"
 )
 
@@ -79,11 +80,37 @@ func (fs *friendshipServiceImpl) GetAll(ctx context.Context, profileID uuid.UUID
 		return nil, err
 	}
 
+	validFriendships := make([]entity.Friendship, 0, len(friendships))
+	for _, friendship := range friendships {
+		_, friendProfile, err := helper.SelectProfiles(profileID, friendship)
+		if err != nil {
+			return nil, err
+		}
+
+		if friendProfile.IsReal() {
+			validFriendships = append(validFriendships, friendship)
+			continue
+		}
+
+		// Check if anon profile has a real association
+		realProfileID, err := fs.profileService.GetRealProfileID(ctx, friendProfile.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Skip if there's a real profile (migration case)
+		if realProfileID != uuid.Nil {
+			continue
+		}
+
+		validFriendships = append(validFriendships, friendship)
+	}
+
 	mapperFunc := func(friendship entity.Friendship) (dto.FriendshipResponse, error) {
 		return mapper.FriendshipToResponse(profile.ID, friendship)
 	}
 
-	return ezutil.MapSliceWithError(friendships, mapperFunc)
+	return ezutil.MapSliceWithError(validFriendships, mapperFunc)
 }
 
 func (fs *friendshipServiceImpl) GetDetails(ctx context.Context, profileID, friendshipID uuid.UUID) (dto.FriendDetails, error) {
@@ -117,6 +144,72 @@ func (fs *friendshipServiceImpl) IsFriends(ctx context.Context, profileID1, prof
 	}
 
 	return true, friendship.Type == appconstant.Anonymous, nil
+}
+
+func (fs *friendshipServiceImpl) CreateReal(ctx context.Context, userProfileID, friendProfileID uuid.UUID) (dto.FriendshipResponse, error) {
+	var response dto.FriendshipResponse
+	err := fs.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
+		profiles, err := fs.profileService.GetByIDs(ctx, []uuid.UUID{userProfileID, friendProfileID})
+		if err != nil {
+			return err
+		}
+
+		var userProfile dto.ProfileResponse
+		var friendProfile dto.ProfileResponse
+		for _, profile := range profiles {
+			if profile.ID == userProfileID {
+				userProfile = profile
+			}
+			if profile.ID == friendProfileID {
+				friendProfile = profile
+			}
+		}
+
+		newFriendship, err := mapper.OrderProfilesToFriendship(userProfile, friendProfile)
+		if err != nil {
+			return err
+		}
+
+		newFriendship.Type = appconstant.Real
+
+		insertedFriendship, err := fs.friendshipRepository.Insert(ctx, newFriendship)
+		if err != nil {
+			return err
+		}
+
+		response, err = mapper.FriendshipToResponse(userProfile.ID, insertedFriendship)
+		return err
+	})
+	return response, err
+}
+
+func (fs *friendshipServiceImpl) RemoveAnonymous(ctx context.Context, userProfileID, friendProfileID uuid.UUID) error {
+	return fs.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
+		friendProfile, err := fs.profileService.GetByID(ctx, friendProfileID)
+		if err != nil {
+			return err
+		}
+		if friendProfile.UserID != uuid.Nil {
+			return ungerr.UnprocessableEntityError("cannot remove friend, is not anonymous")
+		}
+
+		friendship, err := fs.friendshipRepository.FindByProfileIDs(ctx, userProfileID, friendProfileID)
+		if err != nil {
+			return err
+		}
+		if friendship.IsZero() || friendship.IsDeleted() {
+			return nil
+		}
+		if friendship.Type != appconstant.Anonymous {
+			return ungerr.UnprocessableEntityError("cannot remove friend, is not anonymous")
+		}
+
+		if err = fs.friendshipRepository.Delete(ctx, friendship); err != nil {
+			return err
+		}
+
+		return fs.profileService.Delete(ctx, friendProfileID)
+	})
 }
 
 func (fs *friendshipServiceImpl) validateExistingAnonymousFriendship(

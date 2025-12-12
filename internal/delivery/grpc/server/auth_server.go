@@ -13,26 +13,26 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-type AuthServer struct {
+type authServer struct {
 	auth.UnimplementedAuthServiceServer
 	validate    *validator.Validate
 	authService service.AuthService
 	oAuthSvc    service.OAuthService
 }
 
-func NewAuthServer(
+func newAuthServer(
 	validate *validator.Validate,
 	authService service.AuthService,
 	oAuthSvc service.OAuthService,
 ) auth.AuthServiceServer {
-	return &AuthServer{
+	return &authServer{
 		validate:    validate,
 		authService: authService,
 		oAuthSvc:    oAuthSvc,
 	}
 }
 
-func (as *AuthServer) Register(ctx context.Context, req *auth.RegisterRequest) (*auth.RegisterResponse, error) {
+func (as *authServer) Register(ctx context.Context, req *auth.RegisterRequest) (*auth.RegisterResponse, error) {
 	request := dto.RegisterRequest{
 		Email:                req.GetEmail(),
 		Password:             req.GetPassword(),
@@ -54,7 +54,7 @@ func (as *AuthServer) Register(ctx context.Context, req *auth.RegisterRequest) (
 	}, nil
 }
 
-func (as *AuthServer) Login(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error) {
+func (as *authServer) Login(ctx context.Context, req *auth.LoginRequest) (*auth.LoginResponse, error) {
 	if req == nil {
 		return nil, eris.New(appconstant.ErrNilRequest)
 	}
@@ -68,7 +68,7 @@ func (as *AuthServer) Login(ctx context.Context, req *auth.LoginRequest) (*auth.
 	}
 }
 
-func (as *AuthServer) handleOAuth2Login(ctx context.Context, req *auth.OAuth2LoginRequest) (*auth.LoginResponse, error) {
+func (as *authServer) handleOAuth2Login(ctx context.Context, req *auth.OAuth2LoginRequest) (*auth.LoginResponse, error) {
 	data := dto.OAuthCallbackData{
 		Provider: req.GetProvider(),
 		Code:     req.GetCode(),
@@ -89,7 +89,7 @@ func (as *AuthServer) handleOAuth2Login(ctx context.Context, req *auth.OAuth2Log
 	}, nil
 }
 
-func (as *AuthServer) handleInternalLogin(ctx context.Context, req *auth.InternalLoginRequest) (*auth.LoginResponse, error) {
+func (as *authServer) handleInternalLogin(ctx context.Context, req *auth.InternalLoginRequest) (*auth.LoginResponse, error) {
 	request := dto.LoginRequest{
 		Email:    req.GetEmail(),
 		Password: req.GetPassword(),
@@ -110,7 +110,7 @@ func (as *AuthServer) handleInternalLogin(ctx context.Context, req *auth.Interna
 	}, nil
 }
 
-func (as *AuthServer) VerifyToken(ctx context.Context, req *auth.VerifyTokenRequest) (*auth.VerifyTokenResponse, error) {
+func (as *authServer) VerifyToken(ctx context.Context, req *auth.VerifyTokenRequest) (*auth.VerifyTokenResponse, error) {
 	authData, err := as.authService.VerifyToken(ctx, req.GetToken())
 	if err != nil {
 		return nil, err
@@ -121,7 +121,7 @@ func (as *AuthServer) VerifyToken(ctx context.Context, req *auth.VerifyTokenRequ
 	}, nil
 }
 
-func (as *AuthServer) GetOAuth2Url(ctx context.Context, req *auth.GetOAuth2UrlRequest) (*auth.GetOAuth2UrlResponse, error) {
+func (as *authServer) GetOAuth2Url(ctx context.Context, req *auth.GetOAuth2UrlRequest) (*auth.GetOAuth2UrlResponse, error) {
 	if req == nil {
 		return nil, eris.New(appconstant.ErrNilRequest)
 	}
@@ -139,7 +139,7 @@ func (as *AuthServer) GetOAuth2Url(ctx context.Context, req *auth.GetOAuth2UrlRe
 	}, nil
 }
 
-func (as *AuthServer) VerifyRegistration(ctx context.Context, req *auth.VerifyRegistrationRequest) (*auth.LoginResponse, error) {
+func (as *authServer) VerifyRegistration(ctx context.Context, req *auth.VerifyRegistrationRequest) (*auth.LoginResponse, error) {
 	if req == nil {
 		return nil, eris.New(appconstant.ErrNilRequest)
 	}
@@ -158,7 +158,7 @@ func (as *AuthServer) VerifyRegistration(ctx context.Context, req *auth.VerifyRe
 	}, nil
 }
 
-func (as *AuthServer) SendResetPassword(ctx context.Context, req *auth.SendResetPasswordRequest) (*emptypb.Empty, error) {
+func (as *authServer) SendResetPassword(ctx context.Context, req *auth.SendResetPasswordRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		return nil, eris.New(appconstant.ErrNilRequest)
 	}
@@ -171,7 +171,7 @@ func (as *AuthServer) SendResetPassword(ctx context.Context, req *auth.SendReset
 	return nil, as.authService.SendResetPassword(ctx, req.GetResetUrl(), req.GetEmail())
 }
 
-func (as *AuthServer) ResetPassword(ctx context.Context, req *auth.ResetPasswordRequest) (*auth.LoginResponse, error) {
+func (as *authServer) ResetPassword(ctx context.Context, req *auth.ResetPasswordRequest) (*auth.LoginResponse, error) {
 	if req == nil {
 		return nil, eris.New(appconstant.ErrNilRequest)
 	}

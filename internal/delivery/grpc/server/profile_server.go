@@ -11,25 +11,26 @@ import (
 	"github.com/itsLeonB/cocoon/internal/service"
 	"github.com/itsLeonB/ezutil/v2"
 	"github.com/itsLeonB/ungerr"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-type ProfileServer struct {
+type profileServer struct {
 	profile.UnimplementedProfileServiceServer
 	validate       *validator.Validate
 	profileService service.ProfileService
 }
 
-func NewProfileServer(
+func newProfileServer(
 	validate *validator.Validate,
 	profileService service.ProfileService,
 ) profile.ProfileServiceServer {
-	return &ProfileServer{
+	return &profileServer{
 		validate:       validate,
 		profileService: profileService,
 	}
 }
 
-func (ps *ProfileServer) Get(ctx context.Context, req *profile.GetRequest) (*profile.GetResponse, error) {
+func (ps *profileServer) Get(ctx context.Context, req *profile.GetRequest) (*profile.GetResponse, error) {
 	id, err := uuid.Parse(req.GetProfileId())
 	if err != nil {
 		return nil, ungerr.ValidationError("profile_id is not a valid uuid")
@@ -45,7 +46,7 @@ func (ps *ProfileServer) Get(ctx context.Context, req *profile.GetRequest) (*pro
 	}, nil
 }
 
-func (ps *ProfileServer) Create(ctx context.Context, req *profile.CreateRequest) (*profile.CreateResponse, error) {
+func (ps *profileServer) Create(ctx context.Context, req *profile.CreateRequest) (*profile.CreateResponse, error) {
 	var userID uuid.UUID
 	if req.GetUserId() != "" {
 		parsedID, err := ezutil.Parse[uuid.UUID](req.GetUserId())
@@ -74,7 +75,7 @@ func (ps *ProfileServer) Create(ctx context.Context, req *profile.CreateRequest)
 	}, nil
 }
 
-func (ps *ProfileServer) GetByIDs(ctx context.Context, req *profile.GetByIDsRequest) (*profile.GetByIDsResponse, error) {
+func (ps *profileServer) GetByIDs(ctx context.Context, req *profile.GetByIDsRequest) (*profile.GetByIDsResponse, error) {
 	profileIDs, err := ezutil.MapSliceWithError(req.GetProfileIds(), ezutil.Parse[uuid.UUID])
 	if err != nil {
 		return nil, err
@@ -90,7 +91,7 @@ func (ps *ProfileServer) GetByIDs(ctx context.Context, req *profile.GetByIDsRequ
 	return &profile.GetByIDsResponse{Profiles: responses}, nil
 }
 
-func (ps *ProfileServer) Update(ctx context.Context, req *profile.UpdateRequest) (*profile.UpdateResponse, error) {
+func (ps *profileServer) Update(ctx context.Context, req *profile.UpdateRequest) (*profile.UpdateResponse, error) {
 	request, err := mapper.FromUpdateProfileRequestProto(req)
 	if err != nil {
 		return nil, err
@@ -104,4 +105,72 @@ func (ps *ProfileServer) Update(ctx context.Context, req *profile.UpdateRequest)
 	return &profile.UpdateResponse{
 		Profile: mapper.ToProfileResponseProto(response),
 	}, nil
+}
+
+func (ps *profileServer) GetByEmail(ctx context.Context, req *profile.GetByEmailRequest) (*profile.GetByEmailResponse, error) {
+	if req == nil {
+		return nil, ungerr.BadRequestError("request is nil")
+	}
+	if req.GetEmail() == "" {
+		return nil, ungerr.BadRequestError("email is empty")
+	}
+
+	response, err := ps.profileService.GetByEmail(ctx, req.GetEmail())
+	if err != nil {
+		return nil, err
+	}
+
+	return &profile.GetByEmailResponse{
+		Profile: mapper.ToProfileResponseProto(response),
+	}, nil
+}
+
+func (ps *profileServer) SearchByName(ctx context.Context, req *profile.SearchByNameRequest) (*profile.SearchByNameResponse, error) {
+	if req == nil {
+		return nil, ungerr.BadRequestError("request is nil")
+	}
+	if req.GetQuery() == "" {
+		return nil, ungerr.BadRequestError("query is empty")
+	}
+	if req.GetLimit() < 1 {
+		return nil, ungerr.BadRequestError("limit must be greater than 0")
+	}
+	if req.GetLimit() > 100 {
+		return nil, ungerr.BadRequestError("limit must be less than or equal to 100")
+	}
+
+	responses, err := ps.profileService.SearchByName(ctx, req.GetQuery(), int(req.GetLimit()))
+	if err != nil {
+		return nil, err
+	}
+
+	return &profile.SearchByNameResponse{
+		Profiles: ezutil.MapSlice(responses, mapper.ToProfileResponseProto),
+	}, nil
+}
+
+func (ps *profileServer) Associate(ctx context.Context, req *profile.AssociateRequest) (*emptypb.Empty, error) {
+	if req == nil {
+		return nil, ungerr.BadRequestError("request is nil")
+	}
+	userProfileID, err := ezutil.Parse[uuid.UUID](req.GetUserProfileId())
+	if err != nil {
+		return nil, err
+	}
+	realProfileID, err := ezutil.Parse[uuid.UUID](req.GetRealProfileId())
+	if err != nil {
+		return nil, err
+	}
+	anonProfileID, err := ezutil.Parse[uuid.UUID](req.GetAnonProfileId())
+	if err != nil {
+		return nil, err
+	}
+
+	request := dto.AssociateProfileRequest{
+		UserProfileID: userProfileID,
+		RealProfileID: realProfileID,
+		AnonProfileID: anonProfileID,
+	}
+
+	return nil, ps.profileService.Associate(ctx, request)
 }

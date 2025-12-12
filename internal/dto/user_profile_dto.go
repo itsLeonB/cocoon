@@ -7,14 +7,16 @@ import (
 )
 
 type ProfileResponse struct {
-	ID        uuid.UUID
-	UserID    uuid.UUID
-	Name      string
-	Avatar    string
-	Email     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
+	ID                       uuid.UUID
+	UserID                   uuid.UUID
+	Name                     string
+	Avatar                   string
+	Email                    string
+	CreatedAt                time.Time
+	UpdatedAt                time.Time
+	DeletedAt                time.Time
+	AssociatedAnonProfileIDs []uuid.UUID
+	RealProfileID            uuid.UUID
 }
 
 type NewProfileRequest struct {
@@ -28,4 +30,10 @@ type UpdateProfileRequest struct {
 	UserID uuid.UUID
 	Name   string
 	Avatar string
+}
+
+type AssociateProfileRequest struct {
+	UserProfileID uuid.UUID
+	RealProfileID uuid.UUID
+	AnonProfileID uuid.UUID
 }
