@@ -91,7 +91,8 @@ func TestProfileService_GetByID_Success(t *testing.T) {
 	profile.ID = profileID
 
 	mockProfileRepo.EXPECT().FindFirst(ctx, gomock.Any()).Return(profile, nil)
-	mockUserRepo.EXPECT().FindFirst(ctx, gomock.Any())
+	mockUserRepo.EXPECT().FindFirst(ctx, gomock.Any()).Return(entity.User{}, nil)
+	mockRelatedRepo.EXPECT().FindAll(ctx, gomock.Any()).Return([]entity.RelatedProfile{}, nil)
 
 	response, err := profileService.GetByID(ctx, profileID)
 
