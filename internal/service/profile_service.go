@@ -71,11 +71,15 @@ func (ps *profileServiceImpl) GetByID(ctx context.Context, id uuid.UUID) (dto.Pr
 		return dto.ProfileResponse{}, err
 	}
 
-	userSpec := crud.Specification[entity.User]{}
-	userSpec.Model.ID = profile.UserID.UUID
-	user, err := ps.userRepo.FindFirst(ctx, userSpec)
-	if err != nil {
-		return dto.ProfileResponse{}, err
+	var email string
+	if profile.IsReal() {
+		userSpec := crud.Specification[entity.User]{}
+		userSpec.Model.ID = profile.UserID.UUID
+		user, err := ps.userRepo.FindFirst(ctx, userSpec)
+		if err != nil {
+			return dto.ProfileResponse{}, err
+		}
+		email = user.Email
 	}
 
 	anonProfileIDs, realProfileID, err := ps.getAssociations(ctx, profile)
@@ -83,7 +87,7 @@ func (ps *profileServiceImpl) GetByID(ctx context.Context, id uuid.UUID) (dto.Pr
 		return dto.ProfileResponse{}, err
 	}
 
-	return mapper.ProfileToResponse(profile, user.Email, anonProfileIDs, realProfileID), nil
+	return mapper.ProfileToResponse(profile, email, anonProfileIDs, realProfileID), nil
 }
 
 func (ps *profileServiceImpl) GetByIDs(ctx context.Context, ids []uuid.UUID) ([]dto.ProfileResponse, error) {
