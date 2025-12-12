@@ -222,8 +222,8 @@ func (ps *profileServiceImpl) getByID(ctx context.Context, id uuid.UUID) (entity
 
 func (ps *profileServiceImpl) Associate(ctx context.Context, request dto.AssociateProfileRequest) error {
 	return ps.transactor.WithinTransaction(ctx, func(ctx context.Context) error {
-		if request.RealProfileID == uuid.Nil || request.AnonProfileID == uuid.Nil {
-			return ungerr.BadRequestError("realProfileID and anonProfileID cannot be nil")
+		if request.RealProfileID == uuid.Nil || request.AnonProfileID == uuid.Nil || request.UserProfileID == uuid.Nil {
+			return ungerr.BadRequestError("userProfileID / realProfileID / anonProfileID cannot be nil")
 		}
 
 		if _, err := ps.getByID(ctx, request.RealProfileID); err != nil {
