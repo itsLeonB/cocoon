@@ -97,10 +97,11 @@ func (as *authServiceImpl) VerifyRegistration(ctx context.Context, token string)
 		if !ok {
 			return eris.New("error asserting email, is not a string")
 		}
-		unixTime, ok := claims.Data["exp"].(int64)
+		exp, ok := claims.Data["exp"].(float64)
 		if !ok {
-			return eris.New("error asserting exp, is not an int64")
+			return eris.New("error asserting exp, is not an float64")
 		}
+		unixTime := int64(exp)
 		if time.Now().Unix() > unixTime {
 			return ungerr.UnauthorizedError("token has expired")
 		}
