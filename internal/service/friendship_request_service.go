@@ -86,7 +86,15 @@ func (fs *friendshipRequestServiceImpl) GetAllSent(ctx context.Context, userProf
 		return nil, err
 	}
 
-	return ezutil.MapSlice(requests, mapper.FriendshipRequestToResponse), nil
+	response := make([]dto.FriendshipRequestResponse, 0, len(requests))
+	for _, request := range requests {
+		if request.BlockedAt.Valid {
+			continue
+		}
+		response = append(response, mapper.FriendshipRequestToResponse(request))
+	}
+
+	return response, nil
 }
 
 func (fs *friendshipRequestServiceImpl) Cancel(ctx context.Context, userProfileID, reqID uuid.UUID) error {
